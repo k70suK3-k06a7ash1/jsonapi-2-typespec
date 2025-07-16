@@ -1,0 +1,67 @@
+description: A simple blog API with articles and authors
+serializers:
+  - description: Serializer for blog articles
+    name: ArticlesSerializer
+    namespace: BlogApi
+    resource:
+      attributes:
+        - description: The article title
+          name: title
+          nullable: false
+          type: string
+        - description: The article content
+          name: content
+          nullable: false
+          type: string
+        - description: When the article was published
+          name: published_at
+          nullable: true
+          type: date
+        - description: The article status
+          enum:
+            - draft
+            - published
+            - archived
+          name: status
+          nullable: false
+          type: string
+      description: Serializer for blog articles
+      relationships:
+        - description: The article author
+          name: author
+          nullable: false
+          resource: authors
+          type: has_one
+        - description: Article tags
+          name: tags
+          nullable: true
+          resource: tags
+          type: has_many
+      type: articles
+  - description: Serializer for blog authors
+    name: AuthorsSerializer
+    namespace: BlogApi
+    resource:
+      attributes:
+        - description: Author full name
+          name: name
+          nullable: false
+          type: string
+        - description: Author email address
+          name: email
+          nullable: false
+          type: string
+        - description: Author biography
+          name: bio
+          nullable: true
+          type: string
+      description: Serializer for blog authors
+      relationships:
+        - description: Articles written by this author
+          name: articles
+          nullable: false
+          resource: articles
+          type: has_many
+      type: authors
+title: Blog API TypeSpec
+version: 1.0.0

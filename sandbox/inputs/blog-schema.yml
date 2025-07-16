@@ -1,0 +1,55 @@
+title: Blog API
+version: 1.0.0
+description: A simple blog API with articles and authors
+serializers:
+  - name: ArticleSerializer
+    description: Serializer for blog articles
+    resource:
+      type: articles
+      description: Blog article resource
+      attributes:
+        - name: title
+          type: string
+          description: The article title
+        - name: content
+          type: string
+          description: The article content
+        - name: published_at
+          type: date
+          nullable: true
+          description: When the article was published
+        - name: status
+          type: string
+          enum: [draft, published, archived]
+          description: The article status
+      relationships:
+        - name: author
+          type: belongs_to
+          resource: authors
+          description: The article author
+        - name: tags
+          type: has_many
+          resource: tags
+          nullable: true
+          description: Article tags
+  - name: AuthorSerializer
+    description: Serializer for blog authors
+    resource:
+      type: authors
+      description: Blog author resource
+      attributes:
+        - name: name
+          type: string
+          description: Author full name
+        - name: email
+          type: string
+          description: Author email address
+        - name: bio
+          type: string
+          nullable: true
+          description: Author biography
+      relationships:
+        - name: articles
+          type: has_many
+          resource: articles
+          description: Articles written by this author

@@ -50,7 +50,7 @@ export class JsonApiToTypeSpecConverter {
         namespace.models.push(model);
 
         if (options.generateOperations) {
-          const operations = this.generateOperationsForResource(serializer, warnings);
+          const operations = this.generateOperationsForResource(serializer);
           namespace.operations.push(...operations);
         }
       } catch (error) {
@@ -158,7 +158,7 @@ export class JsonApiToTypeSpecConverter {
     };
   }
 
-  private generateOperationsForResource(serializer: JsonApiSerializer, warnings: string[]): TypeSpecOperation[] {
+  private generateOperationsForResource(serializer: JsonApiSerializer): TypeSpecOperation[] {
     const resourceName = this.pascalCase(serializer.resource.type);
     const resourcePath = `/${serializer.resource.type}`;
 

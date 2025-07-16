@@ -14,13 +14,9 @@ export class YamlOutput {
     try {
       return stringify(spec, {
         indent: 2,
-        lineWidth: 0, // No line width limit
+        lineWidth: 0,
         minContentWidth: 0,
         sortMapEntries: false, // Preserve order for OpenAPI spec
-        quotingType: '"',
-        defaultKeyType: null,
-        defaultStringType: 'PLAIN',
-        blockQuote: 'literal',
       });
     } catch (error) {
       throw new Error(`Failed to convert OpenAPI spec to YAML: ${error instanceof Error ? error.message : String(error)}`);

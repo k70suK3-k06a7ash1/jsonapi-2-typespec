@@ -51,12 +51,9 @@ export class YamlLoader {
     try {
       return stringify(schema, {
         indent: 2,
-        lineWidth: 0, // No line width limit
+        lineWidth: 0,
         minContentWidth: 0,
         sortMapEntries: true,
-        quotingType: '"',
-        defaultKeyType: null,
-        defaultStringType: 'PLAIN',
       });
     } catch (error) {
       throw new Error(`Failed to convert schema to YAML: ${error instanceof Error ? error.message : String(error)}`);

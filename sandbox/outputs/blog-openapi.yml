@@ -1,0 +1,488 @@
+openapi: 3.0.3
+info:
+  title: Blog API
+  version: 1.0.0
+  description: A simple blog API with articles and authors
+servers:
+  - url: https://api.myblog.com/v1
+    description: Production server
+  - url: https://staging-api.myblog.com/v1
+    description: Staging server
+paths:
+  /articles:
+    get:
+      summary: List articles resources
+      description: Retrieve a list of articles resources
+      operationId: listArticles
+      responses:
+        "200":
+          description: List of articles resources
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/ArticlesCollection"
+      tags:
+        - Articles
+    post:
+      summary: Create articles resource
+      description: Create a new articles resource
+      operationId: createArticles
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/Articles"
+      responses:
+        "201":
+          description: Created articles resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Articles"
+        "400":
+          description: Bad request
+      tags:
+        - Articles
+  /articles/{id}:
+    get:
+      summary: Get articles resource
+      description: Retrieve a specific articles resource
+      operationId: getArticles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The articles ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The articles resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Articles"
+        "404":
+          description: Resource not found
+      tags:
+        - Articles
+    patch:
+      summary: Update articles resource
+      description: Update a specific articles resource
+      operationId: updateArticles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The articles ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/Articles"
+      responses:
+        "200":
+          description: Updated articles resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Articles"
+        "404":
+          description: Resource not found
+      tags:
+        - Articles
+    delete:
+      summary: Delete articles resource
+      description: Delete a specific articles resource
+      operationId: deleteArticles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The articles ID
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Resource deleted successfully
+        "404":
+          description: Resource not found
+      tags:
+        - Articles
+  /authors:
+    get:
+      summary: List authors resources
+      description: Retrieve a list of authors resources
+      operationId: listAuthors
+      responses:
+        "200":
+          description: List of authors resources
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/AuthorsCollection"
+      tags:
+        - Authors
+    post:
+      summary: Create authors resource
+      description: Create a new authors resource
+      operationId: createAuthors
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/Authors"
+      responses:
+        "201":
+          description: Created authors resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Authors"
+        "400":
+          description: Bad request
+      tags:
+        - Authors
+  /authors/{id}:
+    get:
+      summary: Get authors resource
+      description: Retrieve a specific authors resource
+      operationId: getAuthors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The authors ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The authors resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Authors"
+        "404":
+          description: Resource not found
+      tags:
+        - Authors
+    patch:
+      summary: Update authors resource
+      description: Update a specific authors resource
+      operationId: updateAuthors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The authors ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/Authors"
+      responses:
+        "200":
+          description: Updated authors resource
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Authors"
+        "404":
+          description: Resource not found
+      tags:
+        - Authors
+    delete:
+      summary: Delete authors resource
+      description: Delete a specific authors resource
+      operationId: deleteAuthors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The authors ID
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Resource deleted successfully
+        "404":
+          description: Resource not found
+      tags:
+        - Authors
+components:
+  schemas:
+    Articles:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the resource
+        type:
+          type: string
+          enum:
+            - articles
+          description: Resource type
+        attributes:
+          type: object
+          properties:
+            title:
+              type: string
+              description: The article title
+            content:
+              type: string
+              description: The article content
+            published_at:
+              type: string
+              format: date-time
+              description: When the article was published
+              nullable: true
+            status:
+              type: string
+              description: The article status
+              enum: &a1
+                - draft
+                - published
+                - archived
+        relationships:
+          type: object
+          properties:
+            author:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                      enum:
+                        - authors
+                  required:
+                    - id
+                    - type
+              required:
+                - data
+            tags:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      type:
+                        type: string
+                        enum:
+                          - tags
+                    required:
+                      - id
+                      - type
+              required:
+                - data
+      required:
+        - id
+        - type
+      description: Serializer for blog articles
+    ArticlesCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the resource
+              type:
+                type: string
+                enum:
+                  - articles
+                description: Resource type
+              attributes:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: The article title
+                  content:
+                    type: string
+                    description: The article content
+                  published_at:
+                    type: string
+                    format: date-time
+                    description: When the article was published
+                    nullable: true
+                  status:
+                    type: string
+                    description: The article status
+                    enum: *a1
+              relationships:
+                type: object
+                properties:
+                  author:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          type:
+                            type: string
+                            enum:
+                              - authors
+                        required:
+                          - id
+                          - type
+                    required:
+                      - data
+                  tags:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                              enum:
+                                - tags
+                          required:
+                            - id
+                            - type
+                    required:
+                      - data
+            required:
+              - id
+              - type
+            description: Serializer for blog articles
+        meta:
+          type: object
+          description: Collection metadata
+      required:
+        - data
+    Authors:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the resource
+        type:
+          type: string
+          enum:
+            - authors
+          description: Resource type
+        attributes:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Author full name
+            email:
+              type: string
+              description: Author email address
+            bio:
+              type: string
+              description: Author biography
+              nullable: true
+        relationships:
+          type: object
+          properties:
+            articles:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      type:
+                        type: string
+                        enum:
+                          - articles
+                    required:
+                      - id
+                      - type
+              required:
+                - data
+      required:
+        - id
+        - type
+      description: Serializer for blog authors
+    AuthorsCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the resource
+              type:
+                type: string
+                enum:
+                  - authors
+                description: Resource type
+              attributes:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Author full name
+                  email:
+                    type: string
+                    description: Author email address
+                  bio:
+                    type: string
+                    description: Author biography
+                    nullable: true
+              relationships:
+                type: object
+                properties:
+                  articles:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                              enum:
+                                - articles
+                          required:
+                            - id
+                            - type
+                    required:
+                      - data
+            required:
+              - id
+              - type
+            description: Serializer for blog authors
+        meta:
+          type: object
+          description: Collection metadata
+      required:
+        - data

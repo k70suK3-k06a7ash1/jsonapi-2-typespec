@@ -2,7 +2,7 @@
  * JSON API serializer utilities
  */
 
-import { JsonApiSerializer, JsonApiResource, JsonApiAttribute, JsonApiRelationship } from './types';
+import { JsonApiSerializer, JsonApiAttribute, JsonApiRelationship } from './types';
 
 export class JsonApiSerializerBuilder {
   private serializer: Partial<JsonApiSerializer> = {};
