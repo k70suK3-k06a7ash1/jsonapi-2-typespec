@@ -54,12 +54,19 @@ This repository operates with three main actors:
 
 ```
 jsonapi-2-typespec/
-├── src/
+├── src/                    # Core library source code
 │   ├── json-api/           # JSON API serializer definitions
 │   ├── typespec/           # TypeSpec definitions
 │   ├── converters/         # Bidirectional conversion logic
 │   └── generators/         # OpenAPI schema generators
-├── docs/                   # Generated documentation (auto-updated)
+├── tests/                  # Test suites
+├── sandbox/                # Demo and testing environment
+│   ├── inputs/             # Sample input schema files
+│   ├── outputs/            # Generated output files
+│   ├── scripts/            # Demo scripts
+│   ├── basic-usage.ts      # Basic usage examples
+│   └── yaml-example.ts     # YAML-specific examples
+├── Makefile               # Build and demo commands
 ├── README.md              # English documentation
 └── README_JP.md           # Japanese documentation
 ```
@@ -590,7 +597,17 @@ npm install
 ### Scripts
 
 ```bash
-npm run build          # Build TypeScript
+# Using Makefile (recommended)
+make help             # Show all available commands
+make install          # Install dependencies
+make build            # Build TypeScript
+make test             # Run tests
+make sandbox          # Run demo with sample conversion
+make demo             # Alias for sandbox
+make clean            # Clean build artifacts and outputs
+
+# Using npm directly
+npm run build         # Build TypeScript
 npm run dev           # Watch mode development
 npm run test          # Run tests
 npm run test:watch    # Run tests in watch mode
@@ -598,6 +615,20 @@ npm run test:ui       # Run tests with UI
 npm run test:coverage # Run tests with coverage
 npm run lint          # Lint code
 npm run format        # Format code
+```
+
+### Quick Demo
+
+```bash
+# Run the complete sandbox demo
+make sandbox
+
+# This will:
+# 1. Build the library
+# 2. Load YAML schema from sandbox/inputs/
+# 3. Convert JSON API → TypeSpec → OpenAPI
+# 4. Test bidirectional conversion
+# 5. Save all outputs to sandbox/outputs/
 ```
 
 ### Testing

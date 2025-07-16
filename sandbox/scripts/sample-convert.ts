@@ -5,7 +5,7 @@ import {
   TypeSpec,
   Converters,
   Generators,
-} from '../src/index';
+} from '../../src/index';
 import * as fs from 'fs';
 
 console.log('🚀 JSON API ⇄ TypeSpec Converter Sample');
@@ -14,7 +14,7 @@ console.log('========================================');
 try {
   // 1. Load JSON API schema from YAML file
   console.log('📥 Step 1: Loading JSON API schema from YAML...');
-  const jsonApiSchema = JsonApi.YamlLoader.loadFromFile('./blog-schema.yml');
+  const jsonApiSchema = JsonApi.YamlLoader.loadFromFile('./sandbox/inputs/blog-schema.yml');
   console.log(`✅ Loaded schema: "${jsonApiSchema.title}" v${jsonApiSchema.version}`);
   console.log(`   📋 Serializers: ${jsonApiSchema.serializers.length}`);
   jsonApiSchema.serializers.forEach(s => {
@@ -48,8 +48,8 @@ try {
   console.log('\n📝 Step 3: Generating TypeSpec code...');
   const typeSpecGenerator = new TypeSpec.TypeSpecGenerator();
   const typeSpecCode = typeSpecGenerator.generateDefinition(typeSpecResult.data);
-  fs.writeFileSync('./blog-api.tsp', typeSpecCode);
-  console.log('✅ Generated blog-api.tsp');
+  fs.writeFileSync('./sandbox/outputs/blog-api.tsp', typeSpecCode);
+  console.log('✅ Generated sandbox/outputs/blog-api.tsp');
 
   // 4. Generate OpenAPI specification
   console.log('\n📊 Step 4: Generating OpenAPI specifications...');
@@ -69,26 +69,26 @@ try {
   });
 
   // Save as JSON
-  Generators.YamlOutput.saveToJsonFile(openApiSpec, './blog-openapi.json');
-  console.log('✅ Generated blog-openapi.json');
+  Generators.YamlOutput.saveToJsonFile(openApiSpec, './sandbox/outputs/blog-openapi.json');
+  console.log('✅ Generated sandbox/outputs/blog-openapi.json');
 
   // Save as YAML
-  Generators.YamlOutput.saveToYamlFile(openApiSpec, './blog-openapi.yml');
-  console.log('✅ Generated blog-openapi.yml');
+  Generators.YamlOutput.saveToYamlFile(openApiSpec, './sandbox/outputs/blog-openapi.yml');
+  console.log('✅ Generated sandbox/outputs/blog-openapi.yml');
 
   // 5. Test auto-detection functionality
   console.log('\n🔍 Step 5: Testing auto-detection...');
   
   // Auto-load YAML file
-  const loadedFromYaml = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
+  const loadedFromYaml = JsonApi.YamlLoader.autoLoad('./sandbox/inputs/blog-schema.yml');
   console.log(`✅ Auto-loaded YAML schema: "${loadedFromYaml.title}"`);
 
   // Auto-load OpenAPI YAML
-  const loadedOpenApiYaml = Generators.YamlOutput.autoLoad('./blog-openapi.yml');
+  const loadedOpenApiYaml = Generators.YamlOutput.autoLoad('./sandbox/outputs/blog-openapi.yml');
   console.log(`✅ Auto-loaded OpenAPI YAML: "${loadedOpenApiYaml.info.title}"`);
 
   // Auto-load OpenAPI JSON
-  const loadedOpenApiJson = Generators.YamlOutput.autoLoad('./blog-openapi.json');
+  const loadedOpenApiJson = Generators.YamlOutput.autoLoad('./sandbox/outputs/blog-openapi.json');
   console.log(`✅ Auto-loaded OpenAPI JSON: "${loadedOpenApiJson.info.title}"`);
 
   // 6. Convert TypeSpec back to JSON API (demonstrate bidirectional conversion)
@@ -105,12 +105,12 @@ try {
     console.log(`   📋 Generated serializers: ${jsonApiResult.data.serializers.length}`);
     
     // Save the reverse-converted schema
-    JsonApi.YamlLoader.saveToFile(jsonApiResult.data, './blog-schema-roundtrip.yml');
-    console.log('✅ Saved roundtrip result to blog-schema-roundtrip.yml');
+    JsonApi.YamlLoader.saveToFile(jsonApiResult.data, './sandbox/outputs/blog-schema-roundtrip.yml');
+    console.log('✅ Saved roundtrip result to sandbox/outputs/blog-schema-roundtrip.yml');
   }
 
   console.log('\n🎉 Sample execution completed successfully!');
-  console.log('\n📄 Generated files:');
+  console.log('\n📄 Generated files in sandbox/outputs/:');
   console.log('   📝 blog-api.tsp - TypeSpec definition');
   console.log('   📊 blog-openapi.json - OpenAPI specification (JSON)');
   console.log('   📊 blog-openapi.yml - OpenAPI specification (YAML)');
