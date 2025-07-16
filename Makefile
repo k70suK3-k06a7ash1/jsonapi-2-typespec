@@ -1,3 +1,18 @@
+pr:
+	gh pr create --title "chore" --base develop --body 'feat'
+merge:
+	gh pr merge --merge
+
+base:
+	git switch develop && git pull origin develop
+
+refresh:
+	git switch develop && git pull origin develop && git switch -c "$$(( ( RANDOM % 9000 ) + 1000 ))"
+## remake
+r: refresh
+
+
+
 # JSON API ⇄ TypeSpec Converter - Makefile
 # =============================================
 
