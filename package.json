@@ -1,0 +1,85 @@
+{
+  "name": "jsonapi-2-typespec",
+  "version": "1.0.0",
+  "description": "A bidirectional conversion tool between JSON API serializers and TypeSpec with automatic OpenAPI schema generation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "jsonapi",
+    "typespec",
+    "openapi",
+    "converter",
+    "serializer",
+    "api",
+    "typescript"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/jsonapi-2-typespec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/jsonapi-2-typespec/issues"
+  },
+  "homepage": "https://github.com/yourusername/jsonapi-2-typespec#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@typespec/compiler": "^0.54.0",
+    "@typespec/openapi3": "^0.54.0",
+    "@typespec/rest": "^0.54.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.5.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./json-api": {
+      "import": "./dist/json-api/index.js",
+      "require": "./dist/json-api/index.js",
+      "types": "./dist/json-api/index.d.ts"
+    },
+    "./typespec": {
+      "import": "./dist/typespec/index.js",
+      "require": "./dist/typespec/index.js",
+      "types": "./dist/typespec/index.d.ts"
+    },
+    "./converters": {
+      "import": "./dist/converters/index.js",
+      "require": "./dist/converters/index.js",
+      "types": "./dist/converters/index.d.ts"
+    }
+  }
+}
