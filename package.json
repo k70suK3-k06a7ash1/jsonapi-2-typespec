@@ -45,11 +45,11 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "@ruby/prism": "^1.2.0",
     "@typespec/compiler": "^0.54.0",
     "@typespec/openapi3": "^0.54.0",
     "@typespec/rest": "^0.54.0",
-    "yaml": "^2.5.1",
-    "@ruby/prism": "^1.2.0"
+    "yaml": "^2.5.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
