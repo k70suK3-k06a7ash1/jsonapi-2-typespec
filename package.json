@@ -67,24 +67,24 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./json-api": {
+      "types": "./dist/json-api/index.d.ts",
       "import": "./dist/json-api/index.js",
-      "require": "./dist/json-api/index.js",
-      "types": "./dist/json-api/index.d.ts"
+      "require": "./dist/json-api/index.js"
     },
     "./typespec": {
+      "types": "./dist/typespec/index.d.ts",
       "import": "./dist/typespec/index.js",
-      "require": "./dist/typespec/index.js",
-      "types": "./dist/typespec/index.d.ts"
+      "require": "./dist/typespec/index.js"
     },
     "./converters": {
+      "types": "./dist/converters/index.d.ts",
       "import": "./dist/converters/index.js",
-      "require": "./dist/converters/index.js",
-      "types": "./dist/converters/index.d.ts"
+      "require": "./dist/converters/index.js"
     }
   }
 }
