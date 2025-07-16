@@ -94,7 +94,32 @@ npm install jsonapi-2-typespec
 
 ### Input/Output Example
 
-#### Input: JSON API Schema
+#### Input: JSON API Schema (YAML format)
+```yaml
+title: Blog API
+version: 1.0.0
+serializers:
+  - name: ArticleSerializer
+    resource:
+      type: articles
+      attributes:
+        - name: title
+          type: string
+        - name: content
+          type: string
+        - name: published_at
+          type: date
+          nullable: true
+        - name: status
+          type: string
+          enum: [draft, published]
+      relationships:
+        - name: author
+          type: belongs_to
+          resource: authors
+```
+
+#### Alternative: JSON Format
 ```json
 {
   "title": "Blog API",
@@ -128,8 +153,11 @@ import {
   Generators,
 } from 'jsonapi-2-typespec';
 
-// Load JSON API schema
-const jsonApiSchema: JsonApi.JsonApiSchema = require('./blog-schema.json');
+// Load JSON API schema from YAML file (auto-detects format)
+const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
+
+// Alternative: Load from JSON file
+// const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.json');
 
 // Convert JSON API to TypeSpec
 const converter = new Converters.JsonApiToTypeSpecConverter();
@@ -142,6 +170,16 @@ const result = converter.convert(jsonApiSchema, {
 const generator = new TypeSpec.TypeSpecGenerator();
 const typeSpecCode = generator.generateDefinition(result.data);
 console.log(typeSpecCode);
+
+// Generate OpenAPI and save in both formats
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+// Save as YAML (preferred)
+Generators.YamlOutput.saveToYamlFile(openApiSpec, 'blog-openapi.yml');
+
+// Save as JSON
+Generators.YamlOutput.saveToJsonFile(openApiSpec, 'blog-openapi.json');
 ```
 
 #### Output: Generated TypeSpec
@@ -312,41 +350,36 @@ const openApiSpec = generator.generate(typeSpecDefinition, {
 
 #### 1. Input Files
 
-**`blog-schema.json`** (JSON API Schema)
-```json
-{
-  "title": "Blog API",
-  "version": "1.0.0",
-  "serializers": [
-    {
-      "name": "ArticleSerializer",
-      "resource": {
-        "type": "articles",
-        "attributes": [
-          { "name": "title", "type": "string" },
-          { "name": "content", "type": "string" },
-          { "name": "published_at", "type": "date", "nullable": true }
-        ],
-        "relationships": [
-          { "name": "author", "type": "belongs_to", "resource": "authors" }
-        ]
-      }
-    }
-  ]
-}
+**`blog-schema.yml`** (JSON API Schema in YAML)
+```yaml
+title: Blog API
+version: 1.0.0
+serializers:
+  - name: ArticleSerializer
+    resource:
+      type: articles
+      attributes:
+        - name: title
+          type: string
+        - name: content
+          type: string
+        - name: published_at
+          type: date
+          nullable: true
+      relationships:
+        - name: author
+          type: belongs_to
+          resource: authors
 ```
 
 #### 2. Conversion Script
 
 **`convert.ts`**
 ```typescript
-import fs from 'fs';
-import path from 'path';
 import { JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
 
-// Load input schema
-const schemaPath = path.join(__dirname, 'blog-schema.json');
-const jsonApiSchema: JsonApi.JsonApiSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+// Load input schema (auto-detects YAML/JSON format)
+const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
 
 // Convert to TypeSpec
 const converter = new Converters.JsonApiToTypeSpecConverter();
@@ -363,14 +396,16 @@ const typeSpecCode = generator.generateDefinition(typeSpecResult.data);
 const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
 const openApiSpec = openApiGenerator.generate(jsonApiSchema);
 
-// Write output files
+// Write output files in multiple formats
 fs.writeFileSync('blog-api.tsp', typeSpecCode);
-fs.writeFileSync('blog-openapi.json', JSON.stringify(openApiSpec, null, 2));
+Generators.YamlOutput.saveToYamlFile(openApiSpec, 'blog-openapi.yml');
+Generators.YamlOutput.saveToJsonFile(openApiSpec, 'blog-openapi.json');
 
 console.log('✅ Conversion completed!');
 console.log('📄 Generated files:');
 console.log('  - blog-api.tsp (TypeSpec)');
-console.log('  - blog-openapi.json (OpenAPI)');
+console.log('  - blog-openapi.yml (OpenAPI YAML)');
+console.log('  - blog-openapi.json (OpenAPI JSON)');
 ```
 
 #### 3. Execution Result
@@ -380,7 +415,8 @@ $ npx ts-node convert.ts
 ✅ Conversion completed!
 📄 Generated files:
   - blog-api.tsp (TypeSpec)
-  - blog-openapi.json (OpenAPI)
+  - blog-openapi.yml (OpenAPI YAML)
+  - blog-openapi.json (OpenAPI JSON)
 ```
 
 #### 4. Output Files
@@ -450,6 +486,64 @@ namespace BlogApi {
     }
   }
 }
+```
+
+### YAML Support
+
+This library supports both JSON and YAML formats for input and output files.
+
+#### Loading Schemas
+
+```typescript
+import { JsonApi } from 'jsonapi-2-typespec';
+
+// Auto-detect format by file extension
+const schema1 = JsonApi.YamlLoader.autoLoad('./schema.yml');   // YAML
+const schema2 = JsonApi.YamlLoader.autoLoad('./schema.json');  // JSON
+
+// Explicitly load YAML
+const yamlSchema = JsonApi.YamlLoader.loadFromFile('./schema.yml');
+
+// Load from YAML string
+const yamlContent = `
+title: My API
+version: 1.0.0
+serializers:
+  - name: UserSerializer
+    resource:
+      type: users
+      attributes:
+        - name: email
+          type: string
+`;
+const schema = JsonApi.YamlLoader.loadFromString(yamlContent);
+```
+
+#### Saving Schemas
+
+```typescript
+// Save as YAML
+JsonApi.YamlLoader.saveToFile(schema, './output.yml');
+
+// Save as JSON (for compatibility)
+const jsonContent = JSON.stringify(schema, null, 2);
+fs.writeFileSync('./output.json', jsonContent);
+```
+
+#### OpenAPI Output Formats
+
+```typescript
+import { Generators } from 'jsonapi-2-typespec';
+
+// Auto-detect format and save
+Generators.YamlOutput.autoSave(openApiSpec, './api.yml');    // YAML
+Generators.YamlOutput.autoSave(openApiSpec, './api.json');   // JSON
+
+// Explicitly save as YAML
+Generators.YamlOutput.saveToYamlFile(openApiSpec, './api.yml');
+
+// Explicitly save as JSON
+Generators.YamlOutput.saveToJsonFile(openApiSpec, './api.json');
 ```
 
 ### Building JSON API Schemas

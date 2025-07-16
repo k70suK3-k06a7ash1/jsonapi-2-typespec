@@ -5,3 +5,4 @@
 export * from './types';
 export * from './serializer';
 export * from './parser';
+export * from './yaml-loader';
