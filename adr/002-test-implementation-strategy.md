@@ -1,6 +1,6 @@
 # ADR-002: Ruby to TypeSpec Test Implementation Strategy
 
-**Date:** 2025-01-16  
+**Date:** 2025-07-16  
 **Status:** Accepted  
 **Deciders:** Development Team  
 

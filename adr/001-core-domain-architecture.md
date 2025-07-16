@@ -1,7 +1,7 @@
 ---
 adr_id: "ADR-001"
 title: "Core Domain Architecture - JSON API as Central Hub"
-date: "2025-01-16"
+date: "2025-07-16"
 status: "Accepted"
 category: "Architecture"
 tags: ["json-api", "architecture", "conversion", "ruby", "typespec"]
