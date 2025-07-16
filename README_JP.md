@@ -85,9 +85,212 @@ jsonapi-2-typespec/
 
 これにより、ドキュメントエコシステム全体への変更の即座な伝播が保証されます。
 
+## インストール
+
+```bash
+npm install jsonapi-2-typespec
+```
+
+## クイックスタート
+
+### 基本的な使用方法
+
+```typescript
+import {
+  JsonApi,
+  TypeSpec,
+  Converters,
+  Generators,
+} from 'jsonapi-2-typespec';
+
+// JSON APIスキーマを定義
+const jsonApiSchema: JsonApi.JsonApiSchema = {
+  title: 'Blog API',
+  version: '1.0.0',
+  serializers: [
+    {
+      name: 'ArticleSerializer',
+      resource: {
+        type: 'articles',
+        attributes: [
+          { name: 'title', type: 'string' },
+          { name: 'content', type: 'string' },
+          { name: 'published_at', type: 'date', nullable: true },
+        ],
+        relationships: [
+          { name: 'author', type: 'belongs_to', resource: 'authors' },
+        ],
+      },
+    },
+  ],
+};
+
+// JSON APIからTypeSpecへ変換
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const result = converter.convert(jsonApiSchema, {
+  namespace: 'BlogApi',
+  generateOperations: true,
+});
+
+// TypeSpecコードを生成
+const generator = new TypeSpec.TypeSpecGenerator();
+const typeSpecCode = generator.generateDefinition(result.data);
+console.log(typeSpecCode);
+
+// JSON APIからOpenAPIを生成
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+console.log(JSON.stringify(openApiSpec, null, 2));
+```
+
+## APIリファレンス
+
+### コアモジュール
+
+- **`JsonApi`** - JSON APIシリアライザーの型とユーティリティ
+- **`TypeSpec`** - TypeSpec定義の型とコード生成
+- **`Converters`** - フォーマット間の双方向変換
+- **`Generators`** - 両フォーマットからのOpenAPIスキーマ生成
+
+### JSON APIからTypeSpecへの変換
+
+```typescript
+import { Converters } from 'jsonapi-2-typespec';
+
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const result = converter.convert(jsonApiSchema, {
+  namespace: 'MyApi',           // カスタム名前空間
+  includeRelationships: true,   // リレーションシップを含める（デフォルト: true）
+  generateOperations: true,     // CRUD操作を生成
+  title: 'My API',             // APIタイトル
+  version: '1.0.0',            // APIバージョン
+});
+
+// 変換エラー・警告をチェック
+if (result.errors.length > 0) {
+  console.error('変換エラー:', result.errors);
+}
+if (result.warnings.length > 0) {
+  console.warn('変換警告:', result.warnings);
+}
+```
+
+### TypeSpecからJSON APIへの変換
+
+```typescript
+import { Converters } from 'jsonapi-2-typespec';
+
+const converter = new Converters.TypeSpecToJsonApiConverter();
+const result = converter.convert(typeSpecDefinition, {
+  namespace: 'MyApi',
+  includeRelationships: true,
+});
+```
+
+### OpenAPI生成
+
+#### JSON APIから
+
+```typescript
+import { Generators } from 'jsonapi-2-typespec';
+
+const generator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = generator.generate(jsonApiSchema, {
+  jsonApiFormat: true,        // JSON API形式を使用（デフォルト: false）
+  servers: [
+    {
+      url: 'https://api.example.com/v1',
+      description: '本番サーバー',
+    },
+  ],
+});
+```
+
+#### TypeSpecから
+
+```typescript
+import { Generators } from 'jsonapi-2-typespec';
+
+const generator = new Generators.OpenApiFromTypeSpecGenerator();
+const openApiSpec = generator.generate(typeSpecDefinition, {
+  servers: [
+    {
+      url: 'https://api.example.com/v1',
+      description: '本番サーバー',
+    },
+  ],
+});
+```
+
+### JSON APIスキーマの構築
+
+```typescript
+import { JsonApi } from 'jsonapi-2-typespec';
+
+const serializer = new JsonApi.JsonApiSerializerBuilder('UserSerializer', 'users')
+  .addAttribute({
+    name: 'email',
+    type: 'string',
+    description: 'ユーザーのメールアドレス',
+  })
+  .addAttribute({
+    name: 'age',
+    type: 'number',
+    nullable: true,
+  })
+  .addRelationship({
+    name: 'posts',
+    type: 'has_many',
+    resource: 'posts',
+  })
+  .setDescription('ユーザーリソースシリアライザー')
+  .build();
+
+// シリアライザーを検証
+const errors = JsonApi.validateJsonApiSerializer(serializer);
+if (errors.length > 0) {
+  console.error('検証エラー:', errors);
+}
+```
+
+## 開発
+
+### セットアップ
+
+```bash
+git clone <repository-url>
+cd jsonapi-2-typespec
+npm install
+```
+
+### スクリプト
+
+```bash
+npm run build          # TypeScriptをビルド
+npm run dev           # 監視モード開発
+npm run test          # テストを実行
+npm run test:watch    # 監視モードでテスト実行
+npm run test:ui       # UIでテスト実行
+npm run test:coverage # カバレッジ付きテスト実行
+npm run lint          # コードをlint
+npm run format        # コードをフォーマット
+```
+
+### テスト
+
+このプロジェクトは[Vitest](https://vitest.dev/)を使用してテストを行います：
+
+```bash
+npm run test          # すべてのテストを実行
+npm run test:watch    # 監視モードでテスト実行
+npm run test:ui       # ブラウザでテストUIを開く
+npm run test:coverage # カバレッジレポートを生成
+```
+
 ## 使用例
 
 - **API設計の一貫性**: プロジェクト間での統一標準の維持
 - **レガシー移行**: 既存のJSON APIシリアライザーからTypeSpecへの変換
 - **コード生成**: TypeSpec定義からのシリアライザー自動生成
 - **ドキュメント自動化**: 実装とAPIドキュメントの同期維持
+- **RoR統合**: TypeSpec/JSON API定義からRubyシリアライザークラスを生成
