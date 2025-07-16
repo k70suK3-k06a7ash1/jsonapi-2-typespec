@@ -15,11 +15,40 @@ This repository enables seamless conversion between JSON API serializer definiti
 
 ## Architecture
 
+### Core Actors
+
+This repository operates with three main actors:
+
+1. **OpenAPI Schema** - Standard API specification format
+2. **TypeSpec** - Microsoft's API definition language  
+3. **JSON API Serializer** - Data model definitions following JSON API specification
+
+### Actor Relation Map
+
 ```
-JSON API Serializer ←→ TypeSpec ←→ OpenAPI Schema
-                    ↓         ↓
-               Documentation Suite
+┌─────────────────┐    bidirectional    ┌─────────────────┐
+│   JSON API      │◄────conversion────►│    TypeSpec     │
+│   Serializer    │                    │                 │
+│  (Data Model)   │                    │                 │
+└─────────┬───────┘                    └─────────┬───────┘
+          │                                      │
+          │ generate                   generate  │
+          ▼                                      ▼
+     ┌─────────────────────────────────────────────────┐
+     │              OpenAPI Schema                     │
+     │           (Documentation Output)                │
+     └─────────────────────────────────────────────────┘
 ```
+
+### Conversion Matrix
+
+| From → To | JSON API Serializer | TypeSpec | OpenAPI Schema |
+|-----------|-------------------|----------|----------------|
+| **JSON API Serializer** | ✓ (identity) | ✓ (convert) | ✓ (generate) |
+| **TypeSpec** | ✓ (convert) | ✓ (identity) | ✓ (generate) |
+| **OpenAPI Schema** | ✗ (read-only) | ✗ (read-only) | ✓ (identity) |
+
+**Note**: OpenAPI Schema serves as the final documentation output and does not convert back to source formats.
 
 ## Project Structure
 
