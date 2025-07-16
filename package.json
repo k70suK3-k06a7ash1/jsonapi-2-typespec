@@ -1,5 +1,5 @@
 {
-  "name": "jsonapi-2-typespec",
+  "name": "ruby-jsonapi-serializer-2-typespec",
   "version": "1.0.0",
   "description": "A bidirectional conversion tool between JSON API serializers and TypeSpec with automatic OpenAPI schema generation",
   "main": "dist/index.js",
