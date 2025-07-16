@@ -11,8 +11,6 @@ refresh:
 ## remake
 r: refresh
 
-
-
 # JSON API ⇄ TypeSpec Converter - Makefile
 # =============================================
 
