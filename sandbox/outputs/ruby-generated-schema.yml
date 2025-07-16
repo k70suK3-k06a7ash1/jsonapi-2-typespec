@@ -1,0 +1,93 @@
+description: Generated from Ruby jsonapi-serializer classes
+serializers:
+  - description: Generated from Ruby ArticleSerializer
+    name: ArticleSerializer
+    namespace: Api
+    resource:
+      attributes:
+        - description: Attribute title
+          name: title
+          nullable: false
+          type: string
+        - description: Attribute content
+          name: content
+          nullable: false
+          type: string
+        - description: Attribute published_at
+          name: published_at
+          nullable: false
+          type: string
+        - description: Attribute reading_time
+          name: reading_time
+          nullable: false
+          type: string
+      relationships:
+        - description: Relationship author
+          name: author
+          resource: users
+          type: belongs_to
+        - description: Relationship comments
+          name: comments
+          resource: comments
+          type: has_many
+        - description: Relationship tags
+          name: tags
+          resource: tags
+          type: has_many
+      type: articles
+  - description: Generated from Ruby AuthorSerializer
+    name: AuthorSerializer
+    namespace: Api
+    resource:
+      attributes:
+        - description: Attribute name
+          name: name
+          nullable: false
+          type: string
+        - description: Attribute email
+          name: email
+          nullable: false
+          type: string
+        - description: Attribute bio
+          name: bio
+          nullable: false
+          type: string
+        - description: Attribute avatar_url
+          name: avatar_url
+          nullable: false
+          type: string
+      relationships:
+        - description: Relationship articles
+          name: articles
+          resource: articles
+          type: has_many
+        - description: Relationship social_links
+          name: social_links
+          resource: links
+          type: has_many
+      type: authors
+  - description: Generated from Ruby CommentSerializer
+    name: CommentSerializer
+    namespace: Api
+    resource:
+      attributes:
+        - description: Attribute content
+          name: content
+          nullable: false
+          type: string
+        - description: Attribute created_at
+          name: created_at
+          nullable: false
+          type: string
+      relationships:
+        - description: Relationship article
+          name: article
+          resource: article
+          type: belongs_to
+        - description: Relationship author
+          name: author
+          resource: users
+          type: belongs_to
+      type: comments
+title: Ruby Serializers API
+version: 1.0.0

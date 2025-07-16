@@ -61,7 +61,14 @@ sandbox: build
 	@mkdir -p sandbox/outputs
 	npx ts-node sandbox/scripts/sample-convert.ts
 
+ruby-demo: build
+	@echo "🚀 Running Ruby serializer conversion demo..."
+	@mkdir -p sandbox/outputs
+	npx ts-node sandbox/scripts/ruby-convert.ts
+
 demo: sandbox
+
+ruby: ruby-demo
 
 # Show project structure
 structure:

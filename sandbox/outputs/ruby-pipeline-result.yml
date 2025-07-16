@@ -1,0 +1,308 @@
+namespaces:
+  - name: RubyApi
+    models:
+      - name: Articles
+        properties:
+          - name: title
+            type: string
+            optional: false
+            description: Attribute title
+          - name: content
+            type: string
+            optional: false
+            description: Attribute content
+          - name: published_at
+            type: string
+            optional: false
+            description: Attribute published_at
+          - name: reading_time
+            type: string
+            optional: false
+            description: Attribute reading_time
+          - name: author
+            type: Users
+            description: Relationship author
+          - name: comments
+            type: Comments[]
+            description: Relationship comments
+          - name: tags
+            type: Tags[]
+            description: Relationship tags
+        description: Generated from Ruby ArticleSerializer
+        decorators:
+          - name: discriminator
+            arguments:
+              - type
+      - name: Authors
+        properties:
+          - name: name
+            type: string
+            optional: false
+            description: Attribute name
+          - name: email
+            type: string
+            optional: false
+            description: Attribute email
+          - name: bio
+            type: string
+            optional: false
+            description: Attribute bio
+          - name: avatar_url
+            type: string
+            optional: false
+            description: Attribute avatar_url
+          - name: articles
+            type: Articles[]
+            description: Relationship articles
+          - name: social_links
+            type: Links[]
+            description: Relationship social_links
+        description: Generated from Ruby AuthorSerializer
+        decorators:
+          - name: discriminator
+            arguments:
+              - type
+      - name: Comments
+        properties:
+          - name: content
+            type: string
+            optional: false
+            description: Attribute content
+          - name: created_at
+            type: string
+            optional: false
+            description: Attribute created_at
+          - name: article
+            type: Article
+            description: Relationship article
+          - name: author
+            type: Users
+            description: Relationship author
+        description: Generated from Ruby CommentSerializer
+        decorators:
+          - name: discriminator
+            arguments:
+              - type
+    operations:
+      - name: listArticles
+        method: get
+        path: /articles
+        responses:
+          - statusCode: 200
+            type: Articles[]
+            description: List of articles resources
+        description: List all articles resources
+      - name: getArticles
+        method: get
+        path: /articles/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The articles ID
+        responses:
+          - statusCode: 200
+            type: Articles
+            description: The articles resource
+          - statusCode: 404
+            description: Resource not found
+        description: Get a specific articles resource
+      - name: createArticles
+        method: post
+        path: /articles
+        requestBody:
+          type: Articles
+          description: The articles resource to create
+        responses:
+          - statusCode: 201
+            type: Articles
+            description: The created articles resource
+          - statusCode: 400
+            description: Bad request
+        description: Create a new articles resource
+      - name: updateArticles
+        method: patch
+        path: /articles/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The articles ID
+        requestBody:
+          type: Articles
+          description: The articles resource updates
+        responses:
+          - statusCode: 200
+            type: Articles
+            description: The updated articles resource
+          - statusCode: 404
+            description: Resource not found
+        description: Update a articles resource
+      - name: deleteArticles
+        method: delete
+        path: /articles/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The articles ID
+        responses:
+          - statusCode: 204
+            description: Resource deleted successfully
+          - statusCode: 404
+            description: Resource not found
+        description: Delete a articles resource
+      - name: listAuthors
+        method: get
+        path: /authors
+        responses:
+          - statusCode: 200
+            type: Authors[]
+            description: List of authors resources
+        description: List all authors resources
+      - name: getAuthors
+        method: get
+        path: /authors/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The authors ID
+        responses:
+          - statusCode: 200
+            type: Authors
+            description: The authors resource
+          - statusCode: 404
+            description: Resource not found
+        description: Get a specific authors resource
+      - name: createAuthors
+        method: post
+        path: /authors
+        requestBody:
+          type: Authors
+          description: The authors resource to create
+        responses:
+          - statusCode: 201
+            type: Authors
+            description: The created authors resource
+          - statusCode: 400
+            description: Bad request
+        description: Create a new authors resource
+      - name: updateAuthors
+        method: patch
+        path: /authors/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The authors ID
+        requestBody:
+          type: Authors
+          description: The authors resource updates
+        responses:
+          - statusCode: 200
+            type: Authors
+            description: The updated authors resource
+          - statusCode: 404
+            description: Resource not found
+        description: Update a authors resource
+      - name: deleteAuthors
+        method: delete
+        path: /authors/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The authors ID
+        responses:
+          - statusCode: 204
+            description: Resource deleted successfully
+          - statusCode: 404
+            description: Resource not found
+        description: Delete a authors resource
+      - name: listComments
+        method: get
+        path: /comments
+        responses:
+          - statusCode: 200
+            type: Comments[]
+            description: List of comments resources
+        description: List all comments resources
+      - name: getComments
+        method: get
+        path: /comments/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The comments ID
+        responses:
+          - statusCode: 200
+            type: Comments
+            description: The comments resource
+          - statusCode: 404
+            description: Resource not found
+        description: Get a specific comments resource
+      - name: createComments
+        method: post
+        path: /comments
+        requestBody:
+          type: Comments
+          description: The comments resource to create
+        responses:
+          - statusCode: 201
+            type: Comments
+            description: The created comments resource
+          - statusCode: 400
+            description: Bad request
+        description: Create a new comments resource
+      - name: updateComments
+        method: patch
+        path: /comments/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The comments ID
+        requestBody:
+          type: Comments
+          description: The comments resource updates
+        responses:
+          - statusCode: 200
+            type: Comments
+            description: The updated comments resource
+          - statusCode: 404
+            description: Resource not found
+        description: Update a comments resource
+      - name: deleteComments
+        method: delete
+        path: /comments/{id}
+        parameters:
+          - name: id
+            in: path
+            type: string
+            required: true
+            description: The comments ID
+        responses:
+          - statusCode: 204
+            description: Resource deleted successfully
+          - statusCode: 404
+            description: Resource not found
+        description: Delete a comments resource
+    imports:
+      - "@typespec/rest"
+      - "@typespec/openapi3"
+imports:
+  - "@typespec/rest"
+  - "@typespec/openapi3"
+title: Ruby Serializers API
+version: 1.0.0
+description: Generated from Ruby jsonapi-serializer classes

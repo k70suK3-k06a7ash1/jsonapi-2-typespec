@@ -8,3 +8,4 @@ export * as JsonApi from './json-api';
 export * as TypeSpec from './typespec';
 export * as Converters from './converters';
 export * as Generators from './generators';
+export * as Ruby from './ruby';

@@ -1,0 +1,1225 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ruby Serializers API",
+    "version": "1.0.0",
+    "description": "Generated from Ruby jsonapi-serializer classes"
+  },
+  "servers": [
+    {
+      "url": "https://api.myapp.com/v1",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/articles": {
+      "get": {
+        "summary": "List articles resources",
+        "description": "Retrieve a list of articles resources",
+        "operationId": "listArticles",
+        "responses": {
+          "200": {
+            "description": "List of articles resources",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlesCollection"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "post": {
+        "summary": "Create articles resource",
+        "description": "Create a new articles resource",
+        "operationId": "createArticles",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Articles"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created articles resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Articles"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/articles/{id}": {
+      "get": {
+        "summary": "Get articles resource",
+        "description": "Retrieve a specific articles resource",
+        "operationId": "getArticles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The articles ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The articles resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Articles"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "patch": {
+        "summary": "Update articles resource",
+        "description": "Update a specific articles resource",
+        "operationId": "updateArticles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The articles ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Articles"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated articles resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Articles"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "delete": {
+        "summary": "Delete articles resource",
+        "description": "Delete a specific articles resource",
+        "operationId": "deleteArticles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The articles ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Resource deleted successfully"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/authors": {
+      "get": {
+        "summary": "List authors resources",
+        "description": "Retrieve a list of authors resources",
+        "operationId": "listAuthors",
+        "responses": {
+          "200": {
+            "description": "List of authors resources",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorsCollection"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authors"
+        ]
+      },
+      "post": {
+        "summary": "Create authors resource",
+        "description": "Create a new authors resource",
+        "operationId": "createAuthors",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Authors"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created authors resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Authors"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "tags": [
+          "Authors"
+        ]
+      }
+    },
+    "/authors/{id}": {
+      "get": {
+        "summary": "Get authors resource",
+        "description": "Retrieve a specific authors resource",
+        "operationId": "getAuthors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The authors ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The authors resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Authors"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Authors"
+        ]
+      },
+      "patch": {
+        "summary": "Update authors resource",
+        "description": "Update a specific authors resource",
+        "operationId": "updateAuthors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The authors ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Authors"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated authors resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Authors"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Authors"
+        ]
+      },
+      "delete": {
+        "summary": "Delete authors resource",
+        "description": "Delete a specific authors resource",
+        "operationId": "deleteAuthors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The authors ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Resource deleted successfully"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Authors"
+        ]
+      }
+    },
+    "/comments": {
+      "get": {
+        "summary": "List comments resources",
+        "description": "Retrieve a list of comments resources",
+        "operationId": "listComments",
+        "responses": {
+          "200": {
+            "description": "List of comments resources",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentsCollection"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Comments"
+        ]
+      },
+      "post": {
+        "summary": "Create comments resource",
+        "description": "Create a new comments resource",
+        "operationId": "createComments",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comments"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created comments resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/comments/{id}": {
+      "get": {
+        "summary": "Get comments resource",
+        "description": "Retrieve a specific comments resource",
+        "operationId": "getComments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The comments ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The comments resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comments"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Comments"
+        ]
+      },
+      "patch": {
+        "summary": "Update comments resource",
+        "description": "Update a specific comments resource",
+        "operationId": "updateComments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The comments ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comments"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated comments resource",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comments"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Comments"
+        ]
+      },
+      "delete": {
+        "summary": "Delete comments resource",
+        "description": "Delete a specific comments resource",
+        "operationId": "deleteComments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The comments ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Resource deleted successfully"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "tags": [
+          "Comments"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Articles": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the resource"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "articles"
+            ],
+            "description": "Resource type"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Attribute title",
+                "nullable": false
+              },
+              "content": {
+                "type": "string",
+                "description": "Attribute content",
+                "nullable": false
+              },
+              "published_at": {
+                "type": "string",
+                "description": "Attribute published_at",
+                "nullable": false
+              },
+              "reading_time": {
+                "type": "string",
+                "description": "Attribute reading_time",
+                "nullable": false
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "author": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "users"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "comments": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "comments"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "tags": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "tags"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": "Generated from Ruby ArticleSerializer"
+      },
+      "ArticlesCollection": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for the resource"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "articles"
+                  ],
+                  "description": "Resource type"
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Attribute title",
+                      "nullable": false
+                    },
+                    "content": {
+                      "type": "string",
+                      "description": "Attribute content",
+                      "nullable": false
+                    },
+                    "published_at": {
+                      "type": "string",
+                      "description": "Attribute published_at",
+                      "nullable": false
+                    },
+                    "reading_time": {
+                      "type": "string",
+                      "description": "Attribute reading_time",
+                      "nullable": false
+                    }
+                  }
+                },
+                "relationships": {
+                  "type": "object",
+                  "properties": {
+                    "author": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "users"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    "comments": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "comments"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    "tags": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "tags"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "type"
+              ],
+              "description": "Generated from Ruby ArticleSerializer"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "description": "Collection metadata"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Authors": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the resource"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "authors"
+            ],
+            "description": "Resource type"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Attribute name",
+                "nullable": false
+              },
+              "email": {
+                "type": "string",
+                "description": "Attribute email",
+                "nullable": false
+              },
+              "bio": {
+                "type": "string",
+                "description": "Attribute bio",
+                "nullable": false
+              },
+              "avatar_url": {
+                "type": "string",
+                "description": "Attribute avatar_url",
+                "nullable": false
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "articles": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "articles"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "social_links": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "links"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": "Generated from Ruby AuthorSerializer"
+      },
+      "AuthorsCollection": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for the resource"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "authors"
+                  ],
+                  "description": "Resource type"
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Attribute name",
+                      "nullable": false
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "Attribute email",
+                      "nullable": false
+                    },
+                    "bio": {
+                      "type": "string",
+                      "description": "Attribute bio",
+                      "nullable": false
+                    },
+                    "avatar_url": {
+                      "type": "string",
+                      "description": "Attribute avatar_url",
+                      "nullable": false
+                    }
+                  }
+                },
+                "relationships": {
+                  "type": "object",
+                  "properties": {
+                    "articles": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "articles"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    "social_links": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "links"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "type"
+              ],
+              "description": "Generated from Ruby AuthorSerializer"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "description": "Collection metadata"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Comments": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the resource"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "comments"
+            ],
+            "description": "Resource type"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "Attribute content",
+                "nullable": false
+              },
+              "created_at": {
+                "type": "string",
+                "description": "Attribute created_at",
+                "nullable": false
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "article": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "article"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "author": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "users"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": "Generated from Ruby CommentSerializer"
+      },
+      "CommentsCollection": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for the resource"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "comments"
+                  ],
+                  "description": "Resource type"
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "description": "Attribute content",
+                      "nullable": false
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "description": "Attribute created_at",
+                      "nullable": false
+                    }
+                  }
+                },
+                "relationships": {
+                  "type": "object",
+                  "properties": {
+                    "article": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "article"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    "author": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "users"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "type"
+              ],
+              "description": "Generated from Ruby CommentSerializer"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "description": "Collection metadata"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      }
+    }
+  }
+}

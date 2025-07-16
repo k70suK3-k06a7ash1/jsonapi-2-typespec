@@ -1,0 +1,145 @@
+{
+  "title": "Ruby Serializers API",
+  "version": "1.0.0",
+  "description": "Generated from Ruby jsonapi-serializer classes",
+  "serializers": [
+    {
+      "name": "ArticleSerializer",
+      "resource": {
+        "type": "articles",
+        "attributes": [
+          {
+            "name": "title",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute title"
+          },
+          {
+            "name": "content",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute content"
+          },
+          {
+            "name": "published_at",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute published_at"
+          },
+          {
+            "name": "reading_time",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute reading_time"
+          }
+        ],
+        "relationships": [
+          {
+            "name": "author",
+            "type": "belongs_to",
+            "resource": "users",
+            "description": "Relationship author"
+          },
+          {
+            "name": "comments",
+            "type": "has_many",
+            "resource": "comments",
+            "description": "Relationship comments"
+          },
+          {
+            "name": "tags",
+            "type": "has_many",
+            "resource": "tags",
+            "description": "Relationship tags"
+          }
+        ]
+      },
+      "description": "Generated from Ruby ArticleSerializer",
+      "namespace": "Api"
+    },
+    {
+      "name": "AuthorSerializer",
+      "resource": {
+        "type": "authors",
+        "attributes": [
+          {
+            "name": "name",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute name"
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute email"
+          },
+          {
+            "name": "bio",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute bio"
+          },
+          {
+            "name": "avatar_url",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute avatar_url"
+          }
+        ],
+        "relationships": [
+          {
+            "name": "articles",
+            "type": "has_many",
+            "resource": "articles",
+            "description": "Relationship articles"
+          },
+          {
+            "name": "social_links",
+            "type": "has_many",
+            "resource": "links",
+            "description": "Relationship social_links"
+          }
+        ]
+      },
+      "description": "Generated from Ruby AuthorSerializer",
+      "namespace": "Api"
+    },
+    {
+      "name": "CommentSerializer",
+      "resource": {
+        "type": "comments",
+        "attributes": [
+          {
+            "name": "content",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute content"
+          },
+          {
+            "name": "created_at",
+            "type": "string",
+            "nullable": false,
+            "description": "Attribute created_at"
+          }
+        ],
+        "relationships": [
+          {
+            "name": "article",
+            "type": "belongs_to",
+            "resource": "article",
+            "description": "Relationship article"
+          },
+          {
+            "name": "author",
+            "type": "belongs_to",
+            "resource": "users",
+            "description": "Relationship author"
+          }
+        ]
+      },
+      "description": "Generated from Ruby CommentSerializer",
+      "namespace": "Api"
+    }
+  ]
+}
