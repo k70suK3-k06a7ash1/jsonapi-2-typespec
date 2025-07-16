@@ -158,9 +158,9 @@ const pluralize = (word: string): string => {
 };
 
 /**
- * Export utility for generating YAML/JSON/TypeSpec output
+ * Export utility for generating YAML/JSON output
  */
-export type OutputFormat = 'json' | 'yaml' | 'typespec';
+export type OutputFormat = 'json' | 'yaml';
 
 export const generateOutput = (format: OutputFormat) => 
   <T>(data: T): string => {
@@ -171,11 +171,6 @@ export const generateOutput = (format: OutputFormat) =>
         // Import YAML stringify function
         const { stringify } = require('yaml');
         return stringify(data);
-      case 'typespec':
-        // For TypeSpec, we expect the data to be a TypeSpecDefinition
-        const { TypeSpecGenerator } = require('../typespec');
-        const generator = new TypeSpecGenerator();
-        return generator.generateDefinition(data);
       default:
         throw new Error(`Unsupported output format: ${format}`);
     }
@@ -188,16 +183,8 @@ export const rubyToOutputPipeline = (
   format: OutputFormat, 
   options: ConversionOptions = {}
 ): ConversionPipeline<RubySerializerClass[], string> => {
-  if (format === 'typespec') {
-    return compose(
-      rubyToTypeSpecPipeline(options),
-      generateOutput(format)
-    );
-  } else {
-    // For JSON/YAML, convert to JSON API schema first
-    return compose(
-      rubyToJsonApiSchema,
-      generateOutput(format)
-    );
-  }
+  return compose(
+    rubyToTypeSpecPipeline(options),
+    generateOutput(format)
+  );
 };
