@@ -1,3 +1,11 @@
+unit-test:
+	npm run test
+## commit
+c: unit-test commit
+
+commit:
+	git add  . && git commit -m 'chore: fix'
+
 pr:
 	gh pr create --title "chore" --base develop --body 'feat'
 merge:
