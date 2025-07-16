@@ -93,8 +93,34 @@ npm install jsonapi-2-typespec
 
 ## クイックスタート
 
-### 基本的な使用方法
+### 入力/出力例
 
+#### 入力: JSON APIスキーマ
+```json
+{
+  "title": "Blog API",
+  "version": "1.0.0",
+  "serializers": [
+    {
+      "name": "ArticleSerializer",
+      "resource": {
+        "type": "articles",
+        "attributes": [
+          { "name": "title", "type": "string" },
+          { "name": "content", "type": "string" },
+          { "name": "published_at", "type": "date", "nullable": true },
+          { "name": "status", "type": "string", "enum": ["draft", "published"] }
+        ],
+        "relationships": [
+          { "name": "author", "type": "belongs_to", "resource": "authors" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+#### 基本的な使用コード
 ```typescript
 import {
   JsonApi,
@@ -103,27 +129,8 @@ import {
   Generators,
 } from 'jsonapi-2-typespec';
 
-// JSON APIスキーマを定義
-const jsonApiSchema: JsonApi.JsonApiSchema = {
-  title: 'Blog API',
-  version: '1.0.0',
-  serializers: [
-    {
-      name: 'ArticleSerializer',
-      resource: {
-        type: 'articles',
-        attributes: [
-          { name: 'title', type: 'string' },
-          { name: 'content', type: 'string' },
-          { name: 'published_at', type: 'date', nullable: true },
-        ],
-        relationships: [
-          { name: 'author', type: 'belongs_to', resource: 'authors' },
-        ],
-      },
-    },
-  ],
-};
+// JSON APIスキーマを読み込み
+const jsonApiSchema: JsonApi.JsonApiSchema = require('./blog-schema.json');
 
 // JSON APIからTypeSpecへ変換
 const converter = new Converters.JsonApiToTypeSpecConverter();
@@ -136,11 +143,91 @@ const result = converter.convert(jsonApiSchema, {
 const generator = new TypeSpec.TypeSpecGenerator();
 const typeSpecCode = generator.generateDefinition(result.data);
 console.log(typeSpecCode);
+```
 
-// JSON APIからOpenAPIを生成
-const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
-const openApiSpec = openApiGenerator.generate(jsonApiSchema);
-console.log(JSON.stringify(openApiSpec, null, 2));
+#### 出力: 生成されたTypeSpec
+```typespec
+import "@typespec/rest";
+import "@typespec/openapi3";
+
+@service({
+  title: "Blog API",
+  version: "1.0.0"
+})
+namespace BlogApi {
+
+  /** ブログ記事リソース */
+  @discriminator("type")
+  model Articles {
+    title: string;
+    content: string;
+    published_at?: utcDateTime | null;
+    status: "draft" | "published";
+    author: Authors;
+  }
+
+  /** 記事リソースの一覧取得 */
+  @route("/articles")
+  @get
+  op listArticles(): Articles[];
+
+  /** 記事リソースの取得 */
+  @route("/articles/{id}")
+  @get
+  op getArticles(id: string): Articles;
+
+  /** 記事リソースの作成 */
+  @route("/articles")
+  @post
+  op createArticles(body: Articles): Articles;
+}
+```
+
+#### 出力: 生成されたOpenAPI
+```json
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/articles": {
+      "get": {
+        "summary": "記事リソースの一覧取得",
+        "operationId": "listArticles",
+        "responses": {
+          "200": {
+            "description": "記事リソースの一覧",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlesCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Articles": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["articles"] },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published_at": { "type": "string", "format": "date-time", "nullable": true },
+          "status": { "type": "string", "enum": ["draft", "published"] }
+        },
+        "required": ["id", "type", "title", "content", "status"]
+      }
+    }
+  }
+}
 ```
 
 ## APIリファレンス
@@ -220,6 +307,150 @@ const openApiSpec = generator.generate(typeSpecDefinition, {
     },
   ],
 });
+```
+
+### 完全なワークフロー例
+
+#### 1. 入力ファイル
+
+**`blog-schema.json`** (JSON APIスキーマ)
+```json
+{
+  "title": "Blog API",
+  "version": "1.0.0",
+  "serializers": [
+    {
+      "name": "ArticleSerializer",
+      "resource": {
+        "type": "articles",
+        "attributes": [
+          { "name": "title", "type": "string" },
+          { "name": "content", "type": "string" },
+          { "name": "published_at", "type": "date", "nullable": true }
+        ],
+        "relationships": [
+          { "name": "author", "type": "belongs_to", "resource": "authors" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+#### 2. 変換スクリプト
+
+**`convert.ts`**
+```typescript
+import fs from 'fs';
+import path from 'path';
+import { JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
+
+// 入力スキーマを読み込み
+const schemaPath = path.join(__dirname, 'blog-schema.json');
+const jsonApiSchema: JsonApi.JsonApiSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+
+// TypeSpecに変換
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const typeSpecResult = converter.convert(jsonApiSchema, {
+  namespace: 'BlogApi',
+  generateOperations: true,
+});
+
+// TypeSpecコードを生成
+const generator = new TypeSpec.TypeSpecGenerator();
+const typeSpecCode = generator.generateDefinition(typeSpecResult.data);
+
+// OpenAPIを生成
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+// 出力ファイルを書き込み
+fs.writeFileSync('blog-api.tsp', typeSpecCode);
+fs.writeFileSync('blog-openapi.json', JSON.stringify(openApiSpec, null, 2));
+
+console.log('✅ 変換完了！');
+console.log('📄 生成されたファイル:');
+console.log('  - blog-api.tsp (TypeSpec)');
+console.log('  - blog-openapi.json (OpenAPI)');
+```
+
+#### 3. 実行結果
+
+```bash
+$ npx ts-node convert.ts
+✅ 変換完了！
+📄 生成されたファイル:
+  - blog-api.tsp (TypeSpec)
+  - blog-openapi.json (OpenAPI)
+```
+
+#### 4. 出力ファイル
+
+**`blog-api.tsp`** (生成されたTypeSpec)
+```typespec
+import "@typespec/rest";
+import "@typespec/openapi3";
+
+@service({
+  title: "Blog API",
+  version: "1.0.0"
+})
+namespace BlogApi {
+  @discriminator("type")
+  model Articles {
+    title: string;
+    content: string;
+    published_at?: utcDateTime | null;
+    author: Authors;
+  }
+
+  @route("/articles")
+  @get
+  op listArticles(): Articles[];
+
+  @route("/articles/{id}")
+  @get
+  op getArticles(id: string): Articles;
+}
+```
+
+**`blog-openapi.json`** (生成されたOpenAPI)
+```json
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/articles": {
+      "get": {
+        "summary": "記事リソースの一覧取得",
+        "operationId": "listArticles",
+        "responses": {
+          "200": {
+            "description": "記事リソースの一覧"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Articles": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["articles"] },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published_at": { "type": "string", "format": "date-time", "nullable": true }
+        },
+        "required": ["id", "type", "title", "content"]
+      }
+    }
+  }
+}
 ```
 
 ### JSON APIスキーマの構築

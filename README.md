@@ -92,8 +92,34 @@ npm install jsonapi-2-typespec
 
 ## Quick Start
 
-### Basic Usage
+### Input/Output Example
 
+#### Input: JSON API Schema
+```json
+{
+  "title": "Blog API",
+  "version": "1.0.0",
+  "serializers": [
+    {
+      "name": "ArticleSerializer",
+      "resource": {
+        "type": "articles",
+        "attributes": [
+          { "name": "title", "type": "string" },
+          { "name": "content", "type": "string" },
+          { "name": "published_at", "type": "date", "nullable": true },
+          { "name": "status", "type": "string", "enum": ["draft", "published"] }
+        ],
+        "relationships": [
+          { "name": "author", "type": "belongs_to", "resource": "authors" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+#### Basic Usage Code
 ```typescript
 import {
   JsonApi,
@@ -102,27 +128,8 @@ import {
   Generators,
 } from 'jsonapi-2-typespec';
 
-// Define a JSON API schema
-const jsonApiSchema: JsonApi.JsonApiSchema = {
-  title: 'Blog API',
-  version: '1.0.0',
-  serializers: [
-    {
-      name: 'ArticleSerializer',
-      resource: {
-        type: 'articles',
-        attributes: [
-          { name: 'title', type: 'string' },
-          { name: 'content', type: 'string' },
-          { name: 'published_at', type: 'date', nullable: true },
-        ],
-        relationships: [
-          { name: 'author', type: 'belongs_to', resource: 'authors' },
-        ],
-      },
-    },
-  ],
-};
+// Load JSON API schema
+const jsonApiSchema: JsonApi.JsonApiSchema = require('./blog-schema.json');
 
 // Convert JSON API to TypeSpec
 const converter = new Converters.JsonApiToTypeSpecConverter();
@@ -135,11 +142,91 @@ const result = converter.convert(jsonApiSchema, {
 const generator = new TypeSpec.TypeSpecGenerator();
 const typeSpecCode = generator.generateDefinition(result.data);
 console.log(typeSpecCode);
+```
 
-// Generate OpenAPI from JSON API
-const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
-const openApiSpec = openApiGenerator.generate(jsonApiSchema);
-console.log(JSON.stringify(openApiSpec, null, 2));
+#### Output: Generated TypeSpec
+```typespec
+import "@typespec/rest";
+import "@typespec/openapi3";
+
+@service({
+  title: "Blog API",
+  version: "1.0.0"
+})
+namespace BlogApi {
+
+  /** Blog article resource */
+  @discriminator("type")
+  model Articles {
+    title: string;
+    content: string;
+    published_at?: utcDateTime | null;
+    status: "draft" | "published";
+    author: Authors;
+  }
+
+  /** List articles resources */
+  @route("/articles")
+  @get
+  op listArticles(): Articles[];
+
+  /** Get articles resource */
+  @route("/articles/{id}")
+  @get
+  op getArticles(id: string): Articles;
+
+  /** Create articles resource */
+  @route("/articles")
+  @post
+  op createArticles(body: Articles): Articles;
+}
+```
+
+#### Output: Generated OpenAPI
+```json
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/articles": {
+      "get": {
+        "summary": "List articles resources",
+        "operationId": "listArticles",
+        "responses": {
+          "200": {
+            "description": "List of articles resources",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlesCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Articles": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["articles"] },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published_at": { "type": "string", "format": "date-time", "nullable": true },
+          "status": { "type": "string", "enum": ["draft", "published"] }
+        },
+        "required": ["id", "type", "title", "content", "status"]
+      }
+    }
+  }
+}
 ```
 
 ## API Reference
@@ -219,6 +306,150 @@ const openApiSpec = generator.generate(typeSpecDefinition, {
     },
   ],
 });
+```
+
+### Complete Workflow Example
+
+#### 1. Input Files
+
+**`blog-schema.json`** (JSON API Schema)
+```json
+{
+  "title": "Blog API",
+  "version": "1.0.0",
+  "serializers": [
+    {
+      "name": "ArticleSerializer",
+      "resource": {
+        "type": "articles",
+        "attributes": [
+          { "name": "title", "type": "string" },
+          { "name": "content", "type": "string" },
+          { "name": "published_at", "type": "date", "nullable": true }
+        ],
+        "relationships": [
+          { "name": "author", "type": "belongs_to", "resource": "authors" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+#### 2. Conversion Script
+
+**`convert.ts`**
+```typescript
+import fs from 'fs';
+import path from 'path';
+import { JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
+
+// Load input schema
+const schemaPath = path.join(__dirname, 'blog-schema.json');
+const jsonApiSchema: JsonApi.JsonApiSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+
+// Convert to TypeSpec
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const typeSpecResult = converter.convert(jsonApiSchema, {
+  namespace: 'BlogApi',
+  generateOperations: true,
+});
+
+// Generate TypeSpec code
+const generator = new TypeSpec.TypeSpecGenerator();
+const typeSpecCode = generator.generateDefinition(typeSpecResult.data);
+
+// Generate OpenAPI
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+// Write output files
+fs.writeFileSync('blog-api.tsp', typeSpecCode);
+fs.writeFileSync('blog-openapi.json', JSON.stringify(openApiSpec, null, 2));
+
+console.log('✅ Conversion completed!');
+console.log('📄 Generated files:');
+console.log('  - blog-api.tsp (TypeSpec)');
+console.log('  - blog-openapi.json (OpenAPI)');
+```
+
+#### 3. Execution Result
+
+```bash
+$ npx ts-node convert.ts
+✅ Conversion completed!
+📄 Generated files:
+  - blog-api.tsp (TypeSpec)
+  - blog-openapi.json (OpenAPI)
+```
+
+#### 4. Output Files
+
+**`blog-api.tsp`** (Generated TypeSpec)
+```typespec
+import "@typespec/rest";
+import "@typespec/openapi3";
+
+@service({
+  title: "Blog API",
+  version: "1.0.0"
+})
+namespace BlogApi {
+  @discriminator("type")
+  model Articles {
+    title: string;
+    content: string;
+    published_at?: utcDateTime | null;
+    author: Authors;
+  }
+
+  @route("/articles")
+  @get
+  op listArticles(): Articles[];
+
+  @route("/articles/{id}")
+  @get
+  op getArticles(id: string): Articles;
+}
+```
+
+**`blog-openapi.json`** (Generated OpenAPI)
+```json
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Blog API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/articles": {
+      "get": {
+        "summary": "List articles resources",
+        "operationId": "listArticles",
+        "responses": {
+          "200": {
+            "description": "List of articles resources"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Articles": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["articles"] },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published_at": { "type": "string", "format": "date-time", "nullable": true }
+        },
+        "required": ["id", "type", "title", "content"]
+      }
+    }
+  }
+}
 ```
 
 ### Building JSON API Schemas
