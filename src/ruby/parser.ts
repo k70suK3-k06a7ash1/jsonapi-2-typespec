@@ -59,8 +59,8 @@ export class RubySerializerParser {
         }
       }
 
-      // Parse serializer directives
-      if (blockDepth === 0) {
+      // Parse serializer directives at root level or individual attribute/relationship lines
+      if (blockDepth === 0 || line.includes('attribute ') || line.includes('has_many ') || line.includes('belongs_to ') || line.includes('has_one ')) {
         this.parseSerializerLine(line, serializer, lines, i);
       }
     }

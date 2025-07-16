@@ -1,7 +1,7 @@
 # JSON API ⇄ TypeSpec Converter - Makefile
 # =============================================
 
-.PHONY: help build test lint clean sandbox demo install dev
+.PHONY: help build test test-scenarios lint clean sandbox demo install dev
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  build       - Build TypeScript code"
 	@echo "  dev         - Build in watch mode"
 	@echo "  test        - Run tests"
+	@echo "  test-scenarios - Run user scenario tests"
 	@echo "  test-watch  - Run tests in watch mode"
 	@echo "  lint        - Run linter"
 	@echo "  clean       - Clean build artifacts"
@@ -40,6 +41,10 @@ dev:
 test:
 	@echo "🧪 Running tests..."
 	npm run test
+
+test-scenarios: build
+	@echo "🧪 Running user scenario tests..."
+	npm test -- tests/scenarios/
 
 test-watch:
 	@echo "👀 Running tests in watch mode..."

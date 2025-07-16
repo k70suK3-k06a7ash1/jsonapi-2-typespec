@@ -1,7 +1,6 @@
 /**
  * Test Suite for Scenario 1: Legacy Rails API Migration to TypeSpec
  * Based on USER_SCENARIOS.md - Legacy migration scenario
- * FIXED VERSION to match actual implementation
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -10,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
-describe('Scenario 1: Legacy Rails API Migration (Fixed)', () => {
+describe('Scenario 1: Legacy Rails API Migration', () => {
   let tempDir: string;
   
   beforeEach(() => {
@@ -25,24 +24,28 @@ describe('Scenario 1: Legacy Rails API Migration (Fixed)', () => {
 
   describe('Legacy User Serializer Migration', () => {
     const legacyUserSerializer = `
-class UserSerializer
-  include JSONAPI::Serializer
-  
-  set_type :users
-  set_id :id
-  
-  attributes :email, :name, :created_at, :updated_at
-  
-  attribute :avatar_url do |user|
-    user.avatar.present? ? user.avatar.url : nil
+module Api
+  module V1
+    class UserSerializer
+      include JSONAPI::Serializer
+      
+      set_type :users
+      set_id :id
+      
+      attributes :email, :name, :created_at, :updated_at
+      
+      attribute :avatar_url do |user|
+        user.avatar.present? ? user.avatar.url : nil
+      end
+      
+      attribute :subscription_status do |user|
+        user.subscription&.status || 'free'
+      end
+      
+      has_many :projects
+      belongs_to :organization
+    end
   end
-  
-  attribute :subscription_status do |user|
-    user.subscription&.status || 'free'
-  end
-  
-  has_many :projects
-  belongs_to :organization
 end
     `.trim();
 
@@ -54,20 +57,21 @@ end
       // Act
       const parsedSerializer = Ruby.RubySerializerParser.parseFile(serializerPath);
 
-      // Assert - Fixed to match actual implementation
+      // Assert
       expect(parsedSerializer.className).toBe('UserSerializer');
+      expect(parsedSerializer.namespace).toBe('Api::V1');
       expect(parsedSerializer.resourceType).toBe('users');
-      expect(parsedSerializer.idField).toBe('id');
       expect(parsedSerializer.attributes).toHaveLength(6); // email, name, created_at, updated_at, avatar_url, subscription_status
       expect(parsedSerializer.relationships).toHaveLength(2); // projects, organization
       
       // Check specific attributes
       const emailAttr = parsedSerializer.attributes.find(a => a.name === 'email');
       expect(emailAttr).toBeDefined();
+      expect(emailAttr?.type).toBe('string');
       
       const avatarUrlAttr = parsedSerializer.attributes.find(a => a.name === 'avatar_url');
       expect(avatarUrlAttr).toBeDefined();
-      expect(avatarUrlAttr?.block).toBeDefined(); // Custom block method
+      expect(avatarUrlAttr?.customMethod).toBe(true);
       
       // Check relationships
       const projectsRel = parsedSerializer.relationships.find(r => r.name === 'projects');
@@ -88,13 +92,13 @@ end
       // Act
       const jsonApiSchema = Ruby.rubyToJsonApiSchema([parsedSerializer]);
 
-      // Assert - Fixed to match actual implementation
-      expect(jsonApiSchema.title).toBe('Ruby Serializers API');
-      expect(jsonApiSchema.description).toBe('Generated from Ruby jsonapi-serializer classes');
+      // Assert
+      expect(jsonApiSchema.title).toBe('Generated from Ruby jsonapi-serializer classes');
       expect(jsonApiSchema.serializers).toHaveLength(1);
       
       const userSerializer = jsonApiSchema.serializers[0];
       expect(userSerializer.name).toBe('UserSerializer');
+      expect(userSerializer.namespace).toBe('Api::V1');
       expect(userSerializer.resource.type).toBe('users');
       expect(userSerializer.resource.attributes).toHaveLength(6);
       expect(userSerializer.resource.relationships).toHaveLength(2);
@@ -107,29 +111,27 @@ end
       const parsedSerializer = Ruby.RubySerializerParser.parseFile(serializerPath);
 
       // Act
-      const typeSpecDefinition = Ruby.rubyToTypeSpecPipeline({
+      const typeSpecPipeline = Ruby.rubyToOutputPipeline('typespec', {
         namespace: 'ApiV1',
         generateOperations: true,
         includeRelationships: true,
         title: 'Legacy API v1',
         version: '1.0.0',
-      })([parsedSerializer]);
+      });
 
-      // Generate TypeSpec code
-      const generator = new TypeSpec.TypeSpecGenerator();
-      const typeSpecCode = generator.generateDefinition(typeSpecDefinition);
+      const typeSpecCode = typeSpecPipeline([parsedSerializer]);
 
-      // Assert - Fixed to match actual TypeSpec generator output
-      expect(typeSpecCode).toContain('Legacy API v1');
-      expect(typeSpecCode).toContain('1.0.0');
+      // Assert
       expect(typeSpecCode).toContain('namespace ApiV1');
       expect(typeSpecCode).toContain('model Users');
-      expect(typeSpecCode).toContain('email: string;');
-      expect(typeSpecCode).toContain('avatar_url?: string | null;');
-      expect(typeSpecCode).toContain('subscription_status?: string | null;');
-      // Relationships become properties in the model
-      expect(typeSpecCode).toContain('projects: Projects');
-      expect(typeSpecCode).toContain('organization: Organization');
+      expect(typeSpecCode).toContain('email: string');
+      expect(typeSpecCode).toContain('avatar_url: string');
+      expect(typeSpecCode).toContain('subscription_status: string');
+      expect(typeSpecCode).toContain('projects: Projects[]');
+      expect(typeSpecCode).toContain('organization: Organizations');
+      expect(typeSpecCode).toContain('@route("/users")');
+      expect(typeSpecCode).toContain('op listUsers()');
+      expect(typeSpecCode).toContain('op getUsers(id: string)');
     });
 
     it('should maintain API compatibility during migration', () => {
@@ -147,44 +149,54 @@ end
       });
 
       // Assert - Check that all original API elements are preserved
-      expect(openApiSpec.info).toBeDefined();
+      expect(openApiSpec.info.title).toBeDefined();
       expect(openApiSpec.paths['/users']).toBeDefined();
       expect(openApiSpec.paths['/users/{id}']).toBeDefined();
       expect(openApiSpec.components.schemas.Users).toBeDefined();
       
       const userSchema = openApiSpec.components.schemas.Users;
-      expect(userSchema.properties.attributes.properties.email).toBeDefined();
-      expect(userSchema.properties.attributes.properties.avatar_url).toBeDefined();
-      expect(userSchema.properties.attributes.properties.subscription_status).toBeDefined();
+      expect(userSchema.properties.email).toBeDefined();
+      expect(userSchema.properties.avatar_url).toBeDefined();
+      expect(userSchema.properties.subscription_status).toBeDefined();
+      expect(userSchema.required).toContain('email');
+      expect(userSchema.required).toContain('name');
     });
   });
 
   describe('Multiple Serializer Migration', () => {
     const projectSerializer = `
-class ProjectSerializer
-  include JSONAPI::Serializer
-  
-  set_type :projects
-  set_id :uuid
-  
-  attributes :name, :description, :status, :created_at
-  
-  belongs_to :user
-  has_many :tasks
+module Api
+  module V1
+    class ProjectSerializer
+      include JSONAPI::Serializer
+      
+      set_type :projects
+      set_id :uuid
+      
+      attributes :name, :description, :status, :created_at
+      
+      belongs_to :user
+      has_many :tasks
+    end
+  end
 end
     `.trim();
 
     const organizationSerializer = `
-class OrganizationSerializer
-  include JSONAPI::Serializer
-  
-  set_type :organizations
-  set_id :id
-  
-  attributes :name, :slug, :plan
-  
-  has_many :users
-  has_many :projects
+module Api
+  module V1
+    class OrganizationSerializer
+      include JSONAPI::Serializer
+      
+      set_type :organizations
+      set_id :id
+      
+      attributes :name, :slug, :plan
+      
+      has_many :users
+      has_many :projects
+    end
+  end
 end
     `.trim();
 
@@ -195,12 +207,16 @@ end
       const orgPath = path.join(tempDir, 'organization_serializer.rb');
       
       const legacyUserSerializer = `
-class UserSerializer
-  include JSONAPI::Serializer
-  set_type :users
-  attributes :email, :name
-  has_many :projects
-  belongs_to :organization
+module Api
+  module V1
+    class UserSerializer
+      include JSONAPI::Serializer
+      set_type :users
+      attributes :email, :name
+      has_many :projects
+      belongs_to :organization
+    end
+  end
 end
       `.trim();
       
@@ -214,12 +230,14 @@ end
       );
 
       const jsonApiSchema = Ruby.rubyToJsonApiSchema(serializers);
-      const typeSpecDefinition = Ruby.jsonApiToTypeSpec({
+      const typeSpecConverter = Ruby.jsonApiToTypeSpec({
         namespace: 'ApiV1',
         generateOperations: true,
         title: 'Legacy API v1',
         version: '1.0.0',
-      })(jsonApiSchema);
+      });
+
+      const typeSpecDefinition = typeSpecConverter(jsonApiSchema);
 
       // Assert
       expect(jsonApiSchema.serializers).toHaveLength(3);
@@ -251,7 +269,7 @@ end
       });
 
       // Assert
-      expect(Object.keys(openApiSpec.paths)).toHaveLength(4); // 2 resources × 2 operations each
+      expect(Object.keys(openApiSpec.paths)).toHaveLength(6); // 3 resources × 2 operations each
       expect(openApiSpec.servers).toHaveLength(2);
       expect(openApiSpec.components.schemas).toHaveProperty('Projects');
       expect(openApiSpec.components.schemas).toHaveProperty('Organizations');
@@ -283,7 +301,7 @@ end
       // Act
       const startTime = Date.now();
       const jsonApiSchema = Ruby.rubyToJsonApiSchema(serializers);
-      const typeSpecDefinition = Ruby.rubyToTypeSpecPipeline({
+      const typeSpecCode = Ruby.rubyToOutputPipeline('typespec', {
         namespace: 'TestApi',
         generateOperations: true,
       })(serializers);
@@ -292,7 +310,7 @@ end
       // Assert
       expect(endTime - startTime).toBeLessThan(5000); // Should complete in under 5 seconds
       expect(jsonApiSchema.serializers).toHaveLength(10);
-      expect(typeSpecDefinition.namespaces[0].models).toHaveLength(10);
+      expect(typeSpecCode).toContain('namespace TestApi');
     });
 
     it('should validate converted TypeSpec syntax', () => {
@@ -311,19 +329,21 @@ end
       const parsedSerializer = Ruby.RubySerializerParser.parseFile(filePath);
 
       // Act
-      const typeSpecDefinition = Ruby.rubyToTypeSpecPipeline({
+      const typeSpecCode = Ruby.rubyToOutputPipeline('typespec', {
         namespace: 'Valid',
         generateOperations: true,
       })([parsedSerializer]);
 
-      const generator = new TypeSpec.TypeSpecGenerator();
-      const typeSpecCode = generator.generateDefinition(typeSpecDefinition);
-
       // Assert - Basic TypeSpec syntax validation
+      expect(typeSpecCode).toMatch(/import\s+"@typespec\/rest"/);
+      expect(typeSpecCode).toMatch(/import\s+"@typespec\/openapi3"/);
       expect(typeSpecCode).toMatch(/namespace\s+Valid\s*{/);
-      expect(typeSpecCode).toMatch(/model\s+Valid\s*{/);
+      expect(typeSpecCode).toMatch(/model\s+Valids\s*{/);
       expect(typeSpecCode).toMatch(/name:\s+string;/);
       expect(typeSpecCode).toMatch(/email:\s+string;/);
+      expect(typeSpecCode).toMatch(/@route\("\/valids"\)/);
+      expect(typeSpecCode).toMatch(/@get/);
+      expect(typeSpecCode).toMatch(/@post/);
     });
   });
 
@@ -342,10 +362,9 @@ class MalformedSerializer
       fs.writeFileSync(filePath, malformedSerializer);
 
       // Act & Assert
-      // The parser should still work but may not extract all information correctly
-      const parsedSerializer = Ruby.RubySerializerParser.parseFile(filePath);
-      expect(parsedSerializer.className).toBe('MalformedSerializer');
-      expect(parsedSerializer.resourceType).toBe('malformed');
+      expect(() => {
+        Ruby.RubySerializerParser.parseFile(filePath);
+      }).toThrow(); // Should throw parsing error
     });
 
     it('should handle missing file gracefully', () => {
@@ -364,7 +383,7 @@ class MalformedSerializer
 
       // Assert
       expect(jsonApiSchema.serializers).toHaveLength(0);
-      expect(jsonApiSchema.title).toBe('Ruby Serializers API');
+      expect(jsonApiSchema.title).toBe('Generated from Ruby jsonapi-serializer classes');
     });
   });
 });
