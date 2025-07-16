@@ -1,7 +1,7 @@
 ---
 adr_id: "ADR-004"
 title: "Ruby Parser Capabilities and Limitations Assessment"
-date: "2025-01-16"
+date: "2025-07-16"
 status: "Accepted"
 category: "Implementation"
 tags: ["ruby", "parser", "ast", "string-parsing", "limitations"]

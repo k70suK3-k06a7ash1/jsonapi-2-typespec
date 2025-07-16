@@ -1,7 +1,7 @@
 # ADR Format Specification for LLM DataSource
 
 **Version:** 1.0  
-**Date:** 2025-01-16  
+**Date:** YYYY-MM-DD  
 **Purpose:** Define optimal ADR format for LLM consumption as project specification reference
 
 ## Overview

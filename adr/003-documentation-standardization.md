@@ -1,7 +1,7 @@
 ---
 adr_id: "ADR-003"
 title: "Bilingual Documentation Standardization"
-date: "2025-01-16"
+date: "2025-07-16"
 status: "Accepted"
 category: "Documentation"
 tags: ["documentation", "bilingual", "japanese", "english", "standardization"]
