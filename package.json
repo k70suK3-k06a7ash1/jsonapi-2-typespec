@@ -31,18 +31,9 @@
     "api",
     "typescript"
   ],
-  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/jsonapi-2-typespec.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/jsonapi-2-typespec/issues"
-  },
-  "homepage": "https://github.com/yourusername/jsonapi-2-typespec#readme",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@ruby/prism": "^1.2.0",
