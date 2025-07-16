@@ -232,7 +232,7 @@ describe('Topological Isomorphism Proof - Mathematical Verification', () => {
         { 
           ruby: 'belongs_to :user', 
           expectedSemanticType: 'reference',
-          verifyFn: (type: string) => !type.includes('[]') && type.match(/^[A-Z]/)
+          verifyFn: (type: string) => !type.includes('[]') && /^[A-Z]/.test(type)
         }
       ];
       
@@ -326,15 +326,15 @@ describe('Topological Isomorphism Proof - Mathematical Verification', () => {
       expect(postModel).toBeDefined();
       
       // Verify bidirectional relationship preservation
-      const userPostsProperty = userModel!.properties.find(p => p.type.includes('Posts'));
-      const postUserProperty = postModel!.properties.find(p => p.type.includes('Users'));
+      const userPostsProperty = userModel!.properties.find(p => p.name === 'posts');
+      const postUserProperty = postModel!.properties.find(p => p.name === 'user');
       
       expect(userPostsProperty).toBeDefined(); // has_many :posts preserved
       expect(postUserProperty).toBeDefined();  // belongs_to :user preserved
       
       // Graph connectivity proof: bidirectional links maintained
       expect(userPostsProperty!.type).toBe('Posts[]');
-      expect(postUserProperty!.type).toBe('Users');
+      expect(postUserProperty!.type).toBe('User');
     });
   });
 
