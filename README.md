@@ -1,84 +1,98 @@
-# JSON API ⇄ TypeSpec Converter
+# Ruby ⇄ JSON API ⇄ TypeSpec Converter
 
-A bidirectional conversion tool between JSON API serializers and TypeSpec with automatic OpenAPI schema generation.
+A comprehensive conversion toolkit for Ruby jsonapi-serializers, JSON API specifications, and TypeSpec with automatic OpenAPI schema generation.
 
 ## Overview
 
-This repository enables seamless conversion between JSON API serializer definitions and TypeSpec, providing a unified approach to API specification management with automatic documentation generation.
+This repository provides a complete conversion pipeline between Ruby jsonapi-serializer classes, JSON API specifications, and TypeSpec definitions. The core domain enables bidirectional conversions through JSON API as the central interchange format.
 
 ## Key Features
 
-- **Bidirectional Conversion**: Convert between JSON API serializers and TypeSpec in both directions
-- **Ruby Integration**: Parse Ruby on Rails jsonapi-serializer classes and convert to TypeSpec
-- **OpenAPI Generation**: Automatically generate OpenAPI schemas from both formats
+- **Ruby → JSON API → TypeSpec**: Parse Ruby jsonapi-serializer classes and convert through JSON API to TypeSpec
+- **TypeSpec → JSON API → Ruby**: Convert TypeSpec definitions through JSON API to Ruby serializer format
+- **JSON API Central Hub**: Use JSON API specifications as the central interchange format
+- **OpenAPI Generation**: Automatically generate OpenAPI schemas from any format
 - **Functional Composition**: Chain converters using functional programming patterns
 - **Documentation Synchronization**: Maintain consistency across all documentation formats
-- **Single Source of Truth**: Use either JSON API or TypeSpec as the authoritative source
+- **Flexible Source Management**: Use Ruby, JSON API, or TypeSpec as the authoritative source
 
 ## Architecture
 
-### Core Actors
+### Core Domain Architecture
 
-This repository operates with four main actors:
+This repository operates with three primary actors connected through two core conversion flows:
 
 1. **Ruby Serializers** - Ruby on Rails jsonapi-serializer gem classes
-2. **JSON API Serializer** - Data model definitions following JSON API specification
-3. **TypeSpec** - Microsoft's API definition language  
-4. **OpenAPI Schema** - Standard API specification format
+2. **JSON API Specification** - Central interchange format following JSON API specification
+3. **TypeSpec** - Microsoft's API definition language
+4. **OpenAPI Schema** - Generated documentation output
 
-### Actor Relation Map
+### Core Conversion Flows
 
 ```
-┌─────────────────┐                    ┌─────────────────┐
-│ Ruby Serializers│────conversion────►│   JSON API      │
-│(jsonapi-serializer)                │   Serializer    │
-│     Classes     │                  │  (Data Model)   │
-└─────────────────┘                  └─────────┬───────┘
-                                               │
-                                    bidirectional
-                                    conversion
-                                               │
+┌─────────────────┐                    ┌─────────────────┐                    ┌─────────────────┐
+│ Ruby Serializers│────── Flow 1 ────►│   JSON API      │────── Flow 2 ────►│    TypeSpec     │
+│(jsonapi-serializer)   Ruby→JSON    │  Specification  │    JSON→TypeSpec  │                 │
+│     Classes     │                  │  (Central Hub)  │                   │                 │
+└─────────────────┘                  └─────────┬───────┘                   └─────────────────┘
+          ▲                                     │                                      │
+          │                                     │                                      │
+          └────── Flow 4 ──────────────────────┼────── Flow 3 ─────────────────────────┘
+             TypeSpec→JSON→Ruby                │           TypeSpec→JSON
                                                ▼
-┌─────────────────┐    bidirectional    ┌─────────────────┐
-│    TypeSpec     │◄────conversion────►│   JSON API      │
-│                 │                    │   Serializer    │
-│                 │                    │  (Data Model)   │
-└─────────┬───────┘                    └─────────┬───────┘
-          │                                      │
-          │ generate                   generate  │
-          ▼                                      ▼
-     ┌─────────────────────────────────────────────────┐
-     │              OpenAPI Schema                     │
-     │           (Documentation Output)                │
-     └─────────────────────────────────────────────────┘
+                                    ┌─────────────────┐
+                                    │  OpenAPI Schema │
+                                    │  (Documentation │
+                                    │     Output)     │
+                                    └─────────────────┘
 ```
+
+**Core Domain Flows:**
+- **Flow 1**: Ruby → JSON API (Parse Ruby serializers to JSON API spec)
+- **Flow 2**: JSON API → TypeSpec (Convert JSON API spec to TypeSpec)
+- **Flow 3**: TypeSpec → JSON API (Convert TypeSpec to JSON API spec)  
+- **Flow 4**: JSON API → Ruby (Generate Ruby serializers from JSON API spec)
 
 ### Conversion Matrix
 
-| From → To | Ruby Serializers | JSON API Serializer | TypeSpec | OpenAPI Schema |
-|-----------|-------------------|-------------------|----------|----------------|
-| **Ruby Serializers** | ✓ (identity) | ✓ (convert) | ✓ (convert) | ✓ (generate) |
-| **JSON API Serializer** | ✗ (read-only) | ✓ (identity) | ✓ (convert) | ✓ (generate) |
-| **TypeSpec** | ✗ (read-only) | ✓ (convert) | ✓ (identity) | ✓ (generate) |
+| From → To | Ruby Serializers | JSON API Specification | TypeSpec | OpenAPI Schema |
+|-----------|-------------------|------------------------|----------|----------------|
+| **Ruby Serializers** | ✓ (identity) | ✓ (Flow 1) | ✓ (Flow 1→2) | ✓ (generate) |
+| **JSON API Specification** | ✓ (Flow 4) | ✓ (identity) | ✓ (Flow 2) | ✓ (generate) |
+| **TypeSpec** | ✓ (Flow 3→4) | ✓ (Flow 3) | ✓ (identity) | ✓ (generate) |
 | **OpenAPI Schema** | ✗ (read-only) | ✗ (read-only) | ✗ (read-only) | ✓ (identity) |
 
-**Note**: OpenAPI Schema serves as the final documentation output and does not convert back to source formats.
+**Core Domain Conversions:**
+- **Direct flows**: Ruby ↔ JSON API ↔ TypeSpec (through central JSON API hub)
+- **Multi-step flows**: Ruby ↔ TypeSpec (via JSON API intermediate step)
+- **Output generation**: All formats → OpenAPI Schema (documentation only)
 
 ## Project Structure
 
 ```
 jsonapi-2-typespec/
-├── src/                    # Core library source code
-│   ├── json-api/           # JSON API serializer definitions
-│   ├── typespec/           # TypeSpec definitions
-│   ├── ruby/               # Ruby serializer integration
+├── src/                    # Core library implementing the 4 conversion flows
+│   ├── ruby/               # Flow 1 & 4: Ruby ↔ JSON API conversion
 │   │   ├── types.ts        # Ruby serializer type definitions
-│   │   ├── parser.ts       # Ruby code string parser
+│   │   ├── parser.ts       # Ruby code string parser (Flow 1: Ruby→JSON)
 │   │   ├── ast-parser.ts   # Ruby AST parser (experimental)
-│   │   ├── converters.ts   # Functional composition converters
+│   │   ├── converters.ts   # Functional composition for Ruby flows
 │   │   └── index.ts        # Ruby module exports
-│   ├── converters/         # Bidirectional conversion logic
-│   └── generators/         # OpenAPI schema generators
+│   ├── json-api/           # Central JSON API specification handling
+│   │   ├── types.ts        # JSON API spec type definitions
+│   │   ├── serializer.ts   # JSON API serializer utilities
+│   │   ├── yaml-loader.ts  # YAML/JSON loading for specs
+│   │   └── index.ts        # JSON API module exports
+│   ├── typespec/           # Flow 2 & 3: TypeSpec ↔ JSON API conversion
+│   │   ├── types.ts        # TypeSpec definition types
+│   │   ├── generator.ts    # TypeSpec code generation (Flow 2: JSON→TypeSpec)
+│   │   ├── parser.ts       # TypeSpec parsing (Flow 3: TypeSpec→JSON)
+│   │   └── index.ts        # TypeSpec module exports
+│   ├── converters/         # Core conversion flow implementations
+│   │   ├── json-api-to-typespec.ts    # Flow 2 implementation
+│   │   ├── typespec-to-json-api.ts    # Flow 3 implementation
+│   │   └── index.ts        # Converter exports
+│   └── generators/         # OpenAPI schema generation from any format
 ├── tests/                  # Test suites
 ├── sandbox/                # Demo and testing environment
 │   ├── inputs/             # Sample input schema files
@@ -176,42 +190,58 @@ serializers:
 }
 ```
 
-#### Basic Usage Code
+#### Core Domain Usage: Ruby → JSON API → TypeSpec
+
 ```typescript
-import {
-  JsonApi,
-  TypeSpec,
-  Converters,
-  Generators,
-} from 'jsonapi-2-typespec';
+import { Ruby, JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
 
-// Load JSON API schema from YAML file (auto-detects format)
-const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
+// Flow 1: Ruby → JSON API
+const rubySerializer = Ruby.RubySerializerParser.parseFile('./app/serializers/article_serializer.rb');
+const jsonApiSchema = Ruby.rubyToJsonApiSchema([rubySerializer]);
 
-// Alternative: Load from JSON file
-// const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.json');
-
-// Convert JSON API to TypeSpec
+// Flow 2: JSON API → TypeSpec  
 const converter = new Converters.JsonApiToTypeSpecConverter();
-const result = converter.convert(jsonApiSchema, {
+const typeSpecResult = converter.convert(jsonApiSchema, {
   namespace: 'BlogApi',
   generateOperations: true,
 });
 
 // Generate TypeSpec code
 const generator = new TypeSpec.TypeSpecGenerator();
-const typeSpecCode = generator.generateDefinition(result.data);
-console.log(typeSpecCode);
+const typeSpecCode = generator.generateDefinition(typeSpecResult.data);
 
-// Generate OpenAPI and save in both formats
+// Generate OpenAPI from any format
 const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
 const openApiSpec = openApiGenerator.generate(jsonApiSchema);
 
-// Save as YAML (preferred)
-Generators.YamlOutput.saveToYamlFile(openApiSpec, 'blog-openapi.yml');
+console.log('Ruby → JSON API → TypeSpec conversion complete!');
+```
 
-// Save as JSON
-Generators.YamlOutput.saveToJsonFile(openApiSpec, 'blog-openapi.json');
+#### Alternative Usage: Start with JSON API Schema
+
+```typescript
+import { JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
+
+// Load JSON API schema directly (YAML/JSON auto-detected)
+const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
+
+// Flow 2: JSON API → TypeSpec
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const result = converter.convert(jsonApiSchema, {
+  namespace: 'BlogApi',
+  generateOperations: true,
+});
+
+// Generate outputs
+const generator = new TypeSpec.TypeSpecGenerator();
+const typeSpecCode = generator.generateDefinition(result.data);
+
+// Generate OpenAPI
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+// Save results
+Generators.YamlOutput.saveToYamlFile(openApiSpec, 'blog-openapi.yml');
 ```
 
 #### Output: Generated TypeSpec
@@ -760,9 +790,16 @@ npm run test:coverage # Generate coverage report
 
 ## Use Cases
 
-- **API Design Consistency**: Maintain unified standards across projects
-- **Legacy Migration**: Convert existing JSON API serializers to TypeSpec
-- **Ruby Integration**: Convert Ruby on Rails jsonapi-serializer classes to TypeSpec
-- **Code Generation**: Auto-generate serializers from TypeSpec definitions
-- **Documentation Automation**: Keep API docs synchronized with implementation
-- **Cross-Platform Support**: Bridge Ruby, TypeScript, and API documentation ecosystems
+### Primary Use Cases (Core Domain)
+
+- **Ruby to TypeSpec Migration**: Convert Ruby on Rails jsonapi-serializer classes to modern TypeSpec definitions via JSON API intermediate format
+- **TypeSpec to Ruby Generation**: Generate Ruby serializer code from TypeSpec definitions for implementation in Rails applications
+- **JSON API Standardization**: Use JSON API specifications as the central source of truth for multi-language API implementations
+- **Legacy Rails Modernization**: Migrate existing Rails APIs to TypeScript/TypeSpec while maintaining compatibility
+
+### Secondary Use Cases
+
+- **API Design Consistency**: Maintain unified standards across Ruby and TypeScript projects
+- **Documentation Automation**: Generate OpenAPI docs from any source format (Ruby/JSON API/TypeSpec)
+- **Cross-Platform Development**: Enable seamless collaboration between Ruby backend and TypeScript frontend teams
+- **Schema Validation**: Ensure consistency between Ruby serializers and TypeScript API clients
