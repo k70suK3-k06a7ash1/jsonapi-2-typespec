@@ -1,84 +1,99 @@
 
-# JSON API ⇄ TypeSpec Converter
+# Ruby ⇄ JSON API ⇄ TypeSpec Converter
 
-JSON APIシリアライザーとTypeSpec間の双方向変換ツール、自動OpenAPIスキーマ生成機能付き。
+Ruby jsonapi-serializer、JSON API仕様、TypeSpec間の包括的な変換ツールキット、自動OpenAPIスキーマ生成機能付き。
 
 ## 概要
 
-このリポジトリは、JSON APIシリアライザー定義とTypeSpec間のシームレスな変換を可能にし、自動ドキュメント生成によるAPI仕様管理の統一的アプローチを提供します。
+このリポジトリは、Ruby jsonapi-serializerクラス、JSON API仕様、TypeSpec定義間の完全な変換パイプラインを提供します。コアドメインは、JSON APIを中央の交換フォーマットとした双方向変換を可能にします。
 
 ## 主な機能
 
-- **双方向変換**: JSON APIシリアライザーとTypeSpec間の両方向での変換
-- **Ruby統合**: Ruby on Rails jsonapi-serializerクラスの解析とTypeSpecへの変換
-- **OpenAPI生成**: 両形式から自動的にOpenAPIスキーマを生成
-- **関数型合成**: 関数型プログラミングパターンによるコンバーターの連鎖
+- **Ruby → JSON API → TypeSpec**: Ruby jsonapi-serializerクラスを解析し、JSON APIを経由してTypeSpecに変換
+- **TypeSpec → JSON API → Ruby**: TypeSpec定義をJSON APIを経由してRubyシリアライザー形式に変換
+- **JSON API中央ハブ**: JSON API仕様を中央の交換フォーマットとして使用
+- **OpenAPI生成**: 任意のフォーマットから自動的にOpenAPIスキーマを生成
+- **関数型合成**: 関数型プログラミングパターンを使用してコンバーターを連鎖
 - **ドキュメント同期**: すべてのドキュメント形式間の一貫性を維持
-- **単一情報源**: JSON APIまたはTypeSpecのいずれかを権威ある情報源として使用
+- **柔軟なソース管理**: Ruby、JSON API、またはTypeSpecを権威ある情報源として使用
 
 ## アーキテクチャ
 
-### コアアクター
+### コアドメインアーキテクチャ
 
-このリポジトリは4つの主要なアクターで動作します：
+このリポジトリは、2つのコア変換フローで接続された3つの主要なアクターで動作します：
 
 1. **Rubyシリアライザー** - Ruby on Rails jsonapi-serializer gemクラス
-2. **JSON API Serializer** - JSON API仕様に従うデータモデル定義
+2. **JSON API仕様** - JSON API仕様に従う中央交換フォーマット
 3. **TypeSpec** - MicrosoftのAPI定義言語
-4. **OpenAPI Schema** - 標準API仕様フォーマット
+4. **OpenAPIスキーマ** - 生成されるドキュメント出力
 
-### アクター関係図
+### コア変換フロー
 
 ```
-┌─────────────────┐                    ┌─────────────────┐
-│ Rubyシリアライザー│────────変換──────►│   JSON API      │
-│(jsonapi-serializer)                │   Serializer    │
-│     クラス       │                  │  (データモデル)   │
-└─────────────────┘                  └─────────┬───────┘
-                                               │
-                                        双方向変換
-                                               │
+┌─────────────────┐                    ┌─────────────────┐                    ┌─────────────────┐
+│ Rubyシリアライザー│───── フロー1 ────►│   JSON API      │───── フロー2 ────►│    TypeSpec     │
+│(jsonapi-serializer)  Ruby→JSON     │     仕様        │   JSON→TypeSpec   │                 │
+│     クラス       │                  │  (中央ハブ)      │                   │                 │
+└─────────────────┘                  └─────────┬───────┘                   └─────────────────┘
+          ▲                                     │                                      │
+          │                                     │                                      │
+          └───── フロー4 ──────────────────────┼───── フロー3 ─────────────────────────┘
+            TypeSpec→JSON→Ruby                │          TypeSpec→JSON
                                                ▼
-┌─────────────────┐    双方向変換      ┌─────────────────┐
-│    TypeSpec     │◄────────────────►│   JSON API      │
-│                 │                    │   Serializer    │
-│                 │                    │  (データモデル)   │
-└─────────┬───────┘                    └─────────┬───────┘
-          │                                      │
-          │ 生成                        生成     │
-          ▼                                      ▼
-     ┌─────────────────────────────────────────────────┐
-     │              OpenAPI Schema                     │
-     │          (ドキュメント出力)                        │
-     └─────────────────────────────────────────────────┘
+                                    ┌─────────────────┐
+                                    │  OpenAPIスキーマ │
+                                    │    (ドキュメント   │
+                                    │      出力)      │
+                                    └─────────────────┘
 ```
+
+**コアドメインフロー:**
+- **フロー1**: Ruby → JSON API（Rubyシリアライザーを JSON API仕様に解析）
+- **フロー2**: JSON API → TypeSpec（JSON API仕様をTypeSpecに変換）
+- **フロー3**: TypeSpec → JSON API（TypeSpecをJSON API仕様に変換）
+- **フロー4**: JSON API → Ruby（JSON API仕様からRubyシリアライザーを生成）
 
 ### 変換マトリクス
 
-| From → To | Rubyシリアライザー | JSON API Serializer | TypeSpec | OpenAPI Schema |
-|-----------|-------------------|-------------------|----------|----------------|
-| **Rubyシリアライザー** | ✓ (同一) | ✓ (変換) | ✓ (変換) | ✓ (生成) |
-| **JSON API Serializer** | ✗ (読み取り専用) | ✓ (同一) | ✓ (変換) | ✓ (生成) |
-| **TypeSpec** | ✗ (読み取り専用) | ✓ (変換) | ✓ (同一) | ✓ (生成) |
-| **OpenAPI Schema** | ✗ (読み取り専用) | ✗ (読み取り専用) | ✗ (読み取り専用) | ✓ (同一) |
+| From → To | Rubyシリアライザー | JSON API仕様 | TypeSpec | OpenAPIスキーマ |
+|-----------|-------------------|--------------|----------|----------------|
+| **Rubyシリアライザー** | ✓ (同一) | ✓ (フロー1) | ✓ (フロー1→2) | ✓ (生成) |
+| **JSON API仕様** | ✓ (フロー4) | ✓ (同一) | ✓ (フロー2) | ✓ (生成) |
+| **TypeSpec** | ✓ (フロー3→4) | ✓ (フロー3) | ✓ (同一) | ✓ (生成) |
+| **OpenAPIスキーマ** | ✗ (読み取り専用) | ✗ (読み取り専用) | ✗ (読み取り専用) | ✓ (同一) |
 
-**注意**: OpenAPIスキーマは最終的なドキュメント出力として機能し、ソース形式への逆変換は行いません。
+**コアドメイン変換:**
+- **直接フロー**: Ruby ↔ JSON API ↔ TypeSpec（中央JSON APIハブ経由）
+- **マルチステップフロー**: Ruby ↔ TypeSpec（JSON API中間ステップ経由）
+- **出力生成**: 全フォーマット → OpenAPIスキーマ（ドキュメント専用）
 
 ## プロジェクト構造
 
 ```
 jsonapi-2-typespec/
-├── src/                    # コアライブラリソースコード
-│   ├── json-api/           # JSON API シリアライザー定義
-│   ├── typespec/           # TypeSpec 定義
-│   ├── ruby/               # Ruby シリアライザー統合
-│   │   ├── types.ts        # Ruby シリアライザー型定義
-│   │   ├── parser.ts       # Ruby コード文字列パーサー
-│   │   ├── ast-parser.ts   # Ruby AST パーサー（実験的）
-│   │   ├── converters.ts   # 関数型合成コンバーター
-│   │   └── index.ts        # Ruby モジュールエクスポート
-│   ├── converters/         # 双方向変換ロジック
-│   └── generators/         # OpenAPI スキーマジェネレーター
+├── src/                    # 4つの変換フローを実装するコアライブラリ
+│   ├── ruby/               # フロー1&4: Ruby ↔ JSON API変換
+│   │   ├── types.ts        # Rubyシリアライザー型定義
+│   │   ├── parser.ts       # Rubyコード文字列パーサー（フロー1: Ruby→JSON）
+│   │   ├── ast-parser.ts   # Ruby ASTパーサー（実験的）
+│   │   ├── converters.ts   # Rubyフロー用関数型合成
+│   │   └── index.ts        # Rubyモジュールエクスポート
+│   ├── json-api/           # 中央JSON API仕様ハンドリング
+│   │   ├── types.ts        # JSON API仕様型定義
+│   │   ├── serializer.ts   # JSON APIシリアライザーユーティリティ
+│   │   ├── yaml-loader.ts  # 仕様用YAML/JSON読み込み
+│   │   └── index.ts        # JSON APIモジュールエクスポート
+│   ├── typespec/           # フロー2&3: TypeSpec ↔ JSON API変換
+│   │   ├── types.ts        # TypeSpec定義型
+│   │   ├── generator.ts    # TypeSpecコード生成（フロー2: JSON→TypeSpec）
+│   │   ├── parser.ts       # TypeSpec解析（フロー3: TypeSpec→JSON）
+│   │   └── index.ts        # TypeSpecモジュールエクスポート
+│   ├── converters/         # コア変換フロー実装
+│   │   ├── json-api-to-typespec.ts    # フロー2実装
+│   │   ├── typespec-to-json-api.ts    # フロー3実装
+│   │   └── index.ts        # コンバーターエクスポート
+│   └── generators/         # 任意フォーマットからのOpenAPIスキーマ生成
 ├── tests/                  # テストスイート
 ├── sandbox/                # デモ・テスト環境
 │   ├── inputs/             # サンプル入力スキーマファイル
@@ -151,29 +166,58 @@ npm install jsonapi-2-typespec
 }
 ```
 
-#### 基本的な使用コード
+#### コアドメイン使用例: Ruby → JSON API → TypeSpec
+
 ```typescript
-import {
-  JsonApi,
-  TypeSpec,
-  Converters,
-  Generators,
-} from 'jsonapi-2-typespec';
+import { Ruby, JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
 
-// JSON APIスキーマを読み込み
-const jsonApiSchema: JsonApi.JsonApiSchema = require('./blog-schema.json');
+// フロー1: Ruby → JSON API
+const rubySerializer = Ruby.RubySerializerParser.parseFile('./app/serializers/article_serializer.rb');
+const jsonApiSchema = Ruby.rubyToJsonApiSchema([rubySerializer]);
 
-// JSON APIからTypeSpecへ変換
+// フロー2: JSON API → TypeSpec  
 const converter = new Converters.JsonApiToTypeSpecConverter();
-const result = converter.convert(jsonApiSchema, {
+const typeSpecResult = converter.convert(jsonApiSchema, {
   namespace: 'BlogApi',
   generateOperations: true,
 });
 
 // TypeSpecコードを生成
 const generator = new TypeSpec.TypeSpecGenerator();
+const typeSpecCode = generator.generateDefinition(typeSpecResult.data);
+
+// 任意のフォーマットからOpenAPIを生成
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+console.log('Ruby → JSON API → TypeSpec変換完了！');
+```
+
+#### 代替使用例: JSON APIスキーマから開始
+
+```typescript
+import { JsonApi, TypeSpec, Converters, Generators } from 'jsonapi-2-typespec';
+
+// JSON APIスキーマを直接読み込み（YAML/JSON自動検出）
+const jsonApiSchema = JsonApi.YamlLoader.autoLoad('./blog-schema.yml');
+
+// フロー2: JSON API → TypeSpec
+const converter = new Converters.JsonApiToTypeSpecConverter();
+const result = converter.convert(jsonApiSchema, {
+  namespace: 'BlogApi',
+  generateOperations: true,
+});
+
+// 出力を生成
+const generator = new TypeSpec.TypeSpecGenerator();
 const typeSpecCode = generator.generateDefinition(result.data);
-console.log(typeSpecCode);
+
+// OpenAPIを生成
+const openApiGenerator = new Generators.OpenApiFromJsonApiGenerator();
+const openApiSpec = openApiGenerator.generate(jsonApiSchema);
+
+// 結果を保存
+Generators.YamlOutput.saveToYamlFile(openApiSpec, 'blog-openapi.yml');
 ```
 
 #### 出力: 生成されたTypeSpec
@@ -652,9 +696,16 @@ npm run test:coverage # カバレッジレポートを生成
 
 ## 使用例
 
-- **API設計の一貫性**: プロジェクト間での統一標準の維持
-- **レガシー移行**: 既存のJSON APIシリアライザーからTypeSpecへの変換
-- **Ruby統合**: Ruby on Rails jsonapi-serializerクラスのTypeSpecへの変換
-- **コード生成**: TypeSpec定義からのシリアライザー自動生成
-- **ドキュメント自動化**: 実装とAPIドキュメントの同期維持
-- **クロスプラットフォーム**: Ruby、TypeScript、APIドキュメントエコシステムの橋渡し
+### 主要使用例（コアドメイン）
+
+- **RubyからTypeSpecへの移行**: Ruby on Rails jsonapi-serializerクラスをJSON API中間フォーマット経由で最新のTypeSpec定義に変換
+- **TypeSpecからRuby生成**: TypeSpec定義からRubyシリアライザーコードを生成してRailsアプリケーションに実装
+- **JSON API標準化**: 多言語API実装の中央情報源としてJSON API仕様を使用
+- **レガシーRails現代化**: 互換性を維持しながら既存のRails APIをTypeScript/TypeSpecに移行
+
+### 副次的使用例
+
+- **API設計の一貫性**: RubyとTypeScriptプロジェクト間での統一標準の維持
+- **ドキュメント自動化**: 任意のソースフォーマット（Ruby/JSON API/TypeSpec）からOpenAPIドキュメントを生成
+- **クロスプラットフォーム開発**: RubyバックエンドチームとTypeScriptフロントエンドチーム間のシームレスな協業を実現
+- **スキーマ検証**: RubyシリアライザーとTypeScript APIクライアント間の一貫性を保証
